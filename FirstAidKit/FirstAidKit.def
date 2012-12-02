@@ -1,0 +1,4 @@
+LIBRARY      "FirstAidKit.DLL"
+
+EXPORTS
+	CreateGrymPlugin	 PRIVATE
