@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -85,7 +114,7 @@
             "SourcePath" = "8:..\\FirstAidKit\\FirstAidKit.dgxpi"
             "TargetName" = "8:FirstAidKit.dgxpi"
             "Tag" = "8:"
-            "Folder" = "8:_1012A027DE4E4A54A42BE58894D34480"
+            "Folder" = "8:_F778022BF36F44E3B264AAC78C428FEF"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -116,6 +145,28 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_2FE63DFDA8DC4AE3A363DAE2F46A0025"
+                    {
+                    "Name" = "8:3.0"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_ADF2942B0F1444CCA08B62FE829B4E79"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_F778022BF36F44E3B264AAC78C428FEF"
+                            {
+                            "Name" = "8:Plugins"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_87B78E2C1C464E28A5BF8509F6EA2DFD"
+                                "Folders"
+                                {
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -135,7 +186,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FirstAidKit for 2gis"
         "ProductCode" = "8:{A55EA314-33F6-4FC0-82A8-AE49CD6017E0}"
-        "PackageCode" = "8:{5FA889FB-5CF8-4EAC-8553-DD8B828DC5AA}"
+        "PackageCode" = "8:{10B07B88-ACA4-4AAD-9EC1-0F2AFB0DEB12}"
         "UpgradeCode" = "8:{ABADD8FC-0BE2-4849-B6DA-DC410551B005}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -659,7 +710,7 @@
             "SourcePath" = "8:..\\Release\\FirstAidKit.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_1012A027DE4E4A54A42BE58894D34480"
+            "Folder" = "8:_F778022BF36F44E3B264AAC78C428FEF"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

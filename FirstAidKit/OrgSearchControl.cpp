@@ -114,14 +114,14 @@ STDMETHODIMP COrgSearchControl::get_SearchDescription(BSTR * pVal)
 	return E_FAIL;
 }
 
-STDMETHODIMP COrgSearchControl::get_SearchCaption(BSTR * pVal)
+STDMETHODIMP COrgSearchControl::get_SearchCaption(BSTR *pVal)
 {
 	try
 	{
 		if (!pVal)
 			return E_POINTER;
 
-		*pVal = OLESTR("Пользовательский поиск");
+		*pVal = _bstr_t(_T("Пользовательский поиск")).Detach();
 
 		return S_OK;
 	} catch (...) { }
