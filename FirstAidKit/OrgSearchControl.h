@@ -1,4 +1,21 @@
+// Copyright (C) 2012 gureedo
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 #pragma once
+
 #include "ControlAppearanceBase.h"
 #include "ControlAppearanceParams.h"
 
@@ -9,13 +26,13 @@ class ATL_NO_VTABLE COrgSearchControl
 {
 public:
 	static GrymCore::ISearchGroupControlPtr CreateInstance(
-		const ControlAppearanceParams & appearance,
-		const GrymCore::IGrymObjectFactory2Ptr & factory);
+		const ControlAppearanceParams &appearance,
+		const GrymCore::IGrymObjectFactory2Ptr &factory );
 
-	~COrgSearchControl(void);
+	~COrgSearchControl() {}
 
 protected:
-	COrgSearchControl(void);
+	COrgSearchControl() {}
 
 	BEGIN_COM_MAP(COrgSearchControl)
 		COM_INTERFACE_ENTRY(GrymCore::IContainerControl)
@@ -24,18 +41,18 @@ protected:
 	END_COM_MAP()
 
 public:	//IContainerControl
-	STDMETHOD(get_InternalControl)(IUnknown ** pVal);
+	STDMETHOD(get_InternalControl)( IUnknown **pVal );
 
 public:	//ISearchGroupControl
-	STDMETHOD(get_SearchEnabled)(VARIANT_BOOL * pVal);
-	STDMETHOD(get_ClearEnabled)(VARIANT_BOOL * pVal);
-	STDMETHOD(raw_FillCriteriaSet)(GrymCore::ICriteriaSet * pCritSet, VARIANT_BOOL * pVal);
-	STDMETHOD(get_SearchDescription)(BSTR * pVal);
-	STDMETHOD(get_SearchCaption)(BSTR * pVal);
+	STDMETHOD(get_SearchEnabled)( VARIANT_BOOL *pVal );
+	STDMETHOD(get_ClearEnabled)( VARIANT_BOOL *pVal );
+	STDMETHOD(raw_FillCriteriaSet)( GrymCore::ICriteriaSet *pCritSet, VARIANT_BOOL *pVal );
+	STDMETHOD(get_SearchDescription)( BSTR *pVal );
+	STDMETHOD(get_SearchCaption)( BSTR *pVal );
 	STDMETHOD(raw_Clear)();
 
 private:
-	void AdjustEditControl(const GrymCore::IGrymObjectFactory2Ptr & factory);
+	void AdjustEditControl( const GrymCore::IGrymObjectFactory2Ptr &factory );
 
 private:
 	// Встроенный элемент управления "поле ввода"

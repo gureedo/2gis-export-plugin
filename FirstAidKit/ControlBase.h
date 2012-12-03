@@ -1,3 +1,19 @@
+// Copyright (C) 2012 gureedo
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 #pragma once
 
 #include "ControlAppearanceBase.h"
@@ -8,8 +24,8 @@ class ATL_NO_VTABLE ControlBase
 	, public GrymCore::ICommandAccelerator
 {
 protected:
-	ControlBase();
-	~ControlBase();
+	ControlBase() : accelerator_(0) {}
+	~ControlBase() {}
 
 	BEGIN_COM_MAP(ControlBase)
 		COM_INTERFACE_ENTRY(GrymCore::ICommandAction)
@@ -17,10 +33,9 @@ protected:
 		COM_INTERFACE_ENTRY_CHAIN(ControlAppearanceBase)
 	END_COM_MAP()
 
-	void SetAccelerator(DWORD accelerator);
+	void SetAccelerator( DWORD accelerator );
 
 public: //ICommandAction
-	// нужно определить в классе потомке
 	STDMETHOD(raw_OnCommand)(void) PURE;
 
 public: //ICommandAccelerator
@@ -30,5 +45,5 @@ protected:
 	DWORD accelerator_;
 
 private:
-	static HRESULT WINAPI ICommandAcceleratorQIFunc(void *pv, REFIID riid, LPVOID *ppv, DWORD dw);
+	static HRESULT WINAPI ICommandAcceleratorQIFunc( void *pv, REFIID riid, LPVOID *ppv, DWORD dw );
 };

@@ -77,9 +77,6 @@
     <ClInclude Include="ControlBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MenuCommand.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ControlContainerBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -96,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OrgDirectoryCustomController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

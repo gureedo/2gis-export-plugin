@@ -1,3 +1,19 @@
+// Copyright (C) 2012 gureedo
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 #include "StdAfx.h"
 #include "PluginImpl.h"
 #include "OrgSearchControl.h"
@@ -11,10 +27,9 @@ GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 	return obj;
 }
 
-STDMETHODIMP CPluginImpl::raw_Initialize(GrymCore::IGrym *pRoot, GrymCore::IBaseViewThread *pBaseView)
+STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBaseViewThread *pBaseView )
 {
-	try
-	{
+	try {
 		grymAppPtr_ = pRoot;
 		baseViewPtr_ = pBaseView;
 
@@ -63,20 +78,21 @@ STDMETHODIMP CPluginImpl::raw_Initialize(GrymCore::IGrym *pRoot, GrymCore::IBase
 		GrymCore::IControlSetPtr(searchGroup_)->AddControl(searchControl_);
 
 		return S_OK;
-	} catch(...){}
+	} catch(...) {
+	}
+
 	return E_FAIL;
 }
 
 STDMETHODIMP CPluginImpl::raw_Terminate()
 {
-	try
-	{
+	try {
 		if ( NULL != customDirController_ ) {
 			GrymCore::IStdDirectoryCustomControllerContainerPtr controllerContainer =
 				baseViewPtr_->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
 			controllerContainer->UnregisterController(customDirController_);
 		}
-		if ( searchGroup_ != NULL && searchControl_ != NULL )
+		if ( NULL != searchGroup_ && NULL != searchControl_ )
 			GrymCore::IControlSetPtr(searchGroup_)->RemoveControl(searchControl_);
 
 		searchControl_ = NULL;
@@ -84,19 +100,17 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 		customDirController_ = NULL;
 		baseViewPtr_ = NULL;
 		grymAppPtr_ = NULL;
+	} catch(...) {
+	}
 
-	}catch(...){}
 	return S_OK;
 }
 
-STDMETHODIMP CPluginImpl::get_XMLInfo(BSTR *pVal)
+STDMETHODIMP CPluginImpl::get_XMLInfo( BSTR *pVal )
 {
-	try
-	{
-		if (!pVal)
-		{
+	try {
+		if ( !pVal)
 			return E_POINTER;
-		}
 		*pVal = 0;
 
 		static const _bstr_t data(OLESTR("<grym_plugin_info>")
@@ -116,7 +130,8 @@ STDMETHODIMP CPluginImpl::get_XMLInfo(BSTR *pVal)
 		*pVal = data.copy();
 
 		return S_OK;
-	}catch(...){}
+	} catch(...) {
+	}
+
 	return E_FAIL;
 }
-
