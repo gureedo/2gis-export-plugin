@@ -37,7 +37,7 @@ class ATL_NO_VTABLE CommandBase
 	, public GrymCore::ICommandAction
 {
 protected:
-	CommandBase( DWORD accelerator = 0 );
+	CommandBase();
 	~CommandBase();
 
 	BEGIN_COM_MAP(CommandBase)
@@ -68,8 +68,7 @@ class ATL_NO_VTABLE ControlBase
 	, public GrymCore::IControlAppearance
 {
 protected:
-	ControlBase(const _bstr_t &placement_code, const _bstr_t &tag, const _bstr_t &caption, 
-		const _bstr_t &description, IUnknown *icon = 0);
+	ControlBase();
 
 	~ControlBase();
 
@@ -103,8 +102,7 @@ class ATL_NO_VTABLE VisibleCommandBase
 	, public GrymCore::IControlAppearance
 {
 protected:
-	VisibleCommandBase(const _bstr_t &placement_code, const _bstr_t &tag, const _bstr_t &caption, 
-		const _bstr_t &description, IUnknown *icon = 0, DWORD accelerator = 0);
+	VisibleCommandBase();
 
 	~VisibleCommandBase();
 
@@ -133,6 +131,7 @@ protected:
 // visible command with state
 //////////////////////////////////////////////////////////////////////////
 
+#if 0
 class ATL_NO_VTABLE VisibleStateCommandBase
 	: public VisibleCommandBase
 	, public GrymCore::ICommandState
@@ -159,3 +158,4 @@ public: // GrymCore::IControlState
 	// default implementation: always not checked
 	STDMETHOD(get_Checked)(VARIANT_BOOL *pVal);
 };
+#endif

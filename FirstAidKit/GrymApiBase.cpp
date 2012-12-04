@@ -21,8 +21,7 @@
 // CommandBase
 //////////////////////////////////////////////////////////////////////////
 
-CommandBase::CommandBase( DWORD accelerator )
-	: accelerator_(accelerator)
+CommandBase::CommandBase()
 {
 }
 
@@ -44,24 +43,23 @@ HRESULT WINAPI CommandBase::ICommandAcceleratorQIFunc( void* pv, REFIID /*riid*/
 
 STDMETHODIMP CommandBase::get_Accelerator( LONG *pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = accelerator_;
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = accelerator_;
-	return S_OK;
+
+	return E_FAIL;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // ControlBase
 //////////////////////////////////////////////////////////////////////////
 
-ControlBase::ControlBase( const _bstr_t &placement_code, const _bstr_t &tag, 
-	const _bstr_t &caption, const _bstr_t &description, IUnknown *icon )
-	: placement_code_(placement_code)
-	, tag_(tag)
-	, caption_(caption)
-	, description_(description)
-	, icon_(icon)
+ControlBase::ControlBase()
 {
 }
 
@@ -71,61 +69,79 @@ ControlBase::~ControlBase()
 
 STDMETHODIMP ControlBase::get_PlacementCode( BSTR *pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = placement_code_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = placement_code_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP ControlBase::get_Tag( BSTR *pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = tag_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = tag_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP ControlBase::get_Caption( BSTR *pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = caption_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = caption_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP ControlBase::get_Description( BSTR *pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = description_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = description_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP ControlBase::get_Icon( IUnknown **pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = IUnknownPtr(icon_).Detach();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = IUnknownPtr(icon_).Detach();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // VisibleCommandBase
 //////////////////////////////////////////////////////////////////////////
 
-VisibleCommandBase::VisibleCommandBase( const _bstr_t &placement_code, const _bstr_t &tag, 
-	const _bstr_t &caption, const _bstr_t &description, IUnknown *icon, DWORD accelerator )
-	: CommandBase(accelerator)
-	, placement_code_(placement_code)
-	, tag_(tag)
-	, caption_(caption)
-	, description_(description)
-	, icon_(icon)
+VisibleCommandBase::VisibleCommandBase()
 {
 }
 
@@ -135,53 +151,79 @@ VisibleCommandBase::~VisibleCommandBase()
 
 STDMETHODIMP VisibleCommandBase::get_PlacementCode(BSTR *pVal)
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = placement_code_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = placement_code_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP VisibleCommandBase::get_Tag(BSTR *pVal)
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = tag_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = tag_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP VisibleCommandBase::get_Caption(BSTR *pVal)
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = caption_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = caption_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 STDMETHODIMP VisibleCommandBase::get_Description(BSTR *pVal)
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = description_.copy();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = description_.copy();
-	return S_OK;
+
+	return E_FAIL;
 }
 
-STDMETHODIMP VisibleCommandBase::get_Icon( IUnknown ** pVal )
+STDMETHODIMP VisibleCommandBase::get_Icon( IUnknown **pVal )
 {
-	if ( !pVal ) {
-		return E_POINTER;
+	try {
+		if ( !pVal ) {
+			return E_POINTER;
+		}
+		*pVal = IUnknownPtr(icon_).Detach();
+		return S_OK;
+	} catch (...) {
 	}
-	*pVal = IUnknownPtr(icon_).Detach();
-	return S_OK;
+
+	return E_FAIL;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// VisibleCommandBase
+// VisibleStateCommandBase
 //////////////////////////////////////////////////////////////////////////
 
+#if 0
 VisibleStateCommandBase::VisibleStateCommandBase( const _bstr_t &placement_code, 
 	const _bstr_t &tag, const _bstr_t &caption, const _bstr_t &description, 
 	IUnknown *icon, DWORD accelerator )
@@ -219,3 +261,4 @@ STDMETHODIMP VisibleStateCommandBase::get_Checked( VARIANT_BOOL *pVal )
 	*pVal = VARIANT_FALSE;
 	return S_OK;
 }
+#endif

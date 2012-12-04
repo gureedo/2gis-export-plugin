@@ -26,21 +26,19 @@ GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance(	const CPlugi
 	GrymCore::ISearchGroupControlPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
+	obj->tag_ = OLESTR("FirstAidKit.MainTab.SearchControl");
+	obj->placement_code_ = 
+		OLESTR("<control_pos>")
+		OLESTR("<size min_width=\"150\" max_width=\"300\" height_in_rows=\"1\" />") 
+		OLESTR("<position column_id=\"100SearchGroup\" row_id=\"500MyRowByID\" order_in_row=\"1\" />")
+		OLESTR("</control_pos>");	
+	
 	obj->AdjustEditControl(pi.baseView->Factory);
 
 	return rv;
 }
 
-static const _bstr_t empty_bstr = OLESTR("");
-static const _bstr_t tag = OLESTR("FirstAidKit.MainTab.SearchControl");
-static const _bstr_t placement_code =
-	OLESTR("<control_pos>")
-	OLESTR("<size min_width=\"150\" max_width=\"300\" height_in_rows=\"1\" />") 
-	OLESTR("<position column_id=\"100SearchGroup\" row_id=\"500MyRowByID\" order_in_row=\"1\" />")
-	OLESTR("</control_pos>");
-
 COrgSearchControl::COrgSearchControl()
-	: ControlBase(placement_code, tag, empty_bstr, empty_bstr)
 {
 }
 

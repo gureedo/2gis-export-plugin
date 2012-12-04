@@ -1,4 +1,21 @@
+// Copyright (C) 2012 gureedo
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 #include "stdafx.h"
+#include "resource.h"
 #include "Util.h"
 #include "CmdExport.h"
 
@@ -9,19 +26,17 @@ GrymCore::ICommandActionPtr CCmdExport::CreateInstance( const CPluginInfo &pi )
 	GrymCore::ICommandActionPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
+	obj->tag_ = OLESTR("FirstAidKit.MainTab.ToolsGroup.CmdExport");
+	obj->placement_code_ = OLESTR("0001CmdExport:0");
+	obj->caption_ = OLESTR("Export");
+	obj->description_ = OLESTR("DESCRIPTION");
+	obj->icon_ = Util::LoadResourceRaster(pi.baseView->Factory, IDB_EXPORT);
+
 	return rv;
 }
 
-static const _bstr_t tag = OLESTR("FirstAidKit.MainTab.ExportButton");
-static const _bstr_t placement_code = OLESTR("1000ExportButton:0");
-static const _bstr_t caption = OLESTR("Export");
-static const _bstr_t description = OLESTR("DESCRIPTION");
-//static IUnknownPtr icon;
-
 CCmdExport::CCmdExport()
-	: VisibleCommandBase(placement_code, tag, caption ,description)
 {
-	//icon_ = Util::LoadResourceRaster()
 }
 
 CCmdExport::~CCmdExport()
@@ -32,8 +47,10 @@ STDMETHODIMP CCmdExport::raw_OnCommand()
 {
 	try {
 		// do stuff here
+
+		return S_OK;
 	} catch (...) {
 	}
 
-	return S_OK;
+	return E_FAIL;
 }

@@ -145,6 +145,7 @@
   <ItemGroup>
     <None Include="FirstAidKit.def" />
     <None Include="FirstAidKit.dgxpi" />
+    <None Include="png2.png" />
     <None Include="res\export.png" />
   </ItemGroup>
   <ItemGroup>

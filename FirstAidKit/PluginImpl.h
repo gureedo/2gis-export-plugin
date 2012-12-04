@@ -50,6 +50,6 @@ private:
 	GrymCore::ISearchGroupControlPtr ctrlSearch_;
 
 	// tools group stuff
-	GrymCore::ISearchRibbonGroupPtr toolsGroup_;
+	GrymCore::IRibbonGroupPtr toolsGroup_;
 	GrymCore::ICommandActionPtr cmdExport_;
 };

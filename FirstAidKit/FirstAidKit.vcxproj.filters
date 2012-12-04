@@ -66,6 +66,7 @@
     <None Include="res\export.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="png2.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PluginImpl.h">
