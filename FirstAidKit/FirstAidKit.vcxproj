@@ -32,11 +32,11 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -128,11 +128,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ControlAppearanceBase.cpp" />
-    <ClCompile Include="ControlBase.cpp" />
+    <ClCompile Include="GrymApiBase.cpp" />
+    <ClCompile Include="CmdExport.cpp" />
     <ClCompile Include="OrgDataRowFilter.cpp" />
     <ClCompile Include="OrgDirectoryCustomController.cpp" />
-    <ClCompile Include="MenuCommand.cpp" />
     <ClCompile Include="PluginImpl.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="OrgSearchControl.cpp" />
@@ -140,25 +139,25 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util.cpp" />
     <ClCompile Include="Wildcard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstAidKit.def" />
     <None Include="FirstAidKit.dgxpi" />
+    <None Include="res\export.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ControlAppearanceBase.h" />
-    <ClInclude Include="ControlAppearanceParams.h" />
-    <ClInclude Include="ControlBase.h" />
-    <ClInclude Include="ControlContainerBase.h" />
+    <ClInclude Include="GrymApiBase.h" />
+    <ClInclude Include="CmdExport.h" />
     <ClInclude Include="OrgDataRowFilter.h" />
     <ClInclude Include="OrgDirectoryCustomController.h" />
-    <ClInclude Include="MenuCommand.h" />
     <ClInclude Include="PluginImpl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="OrgSearchControl.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="Wildcard.h" />
   </ItemGroup>
   <ItemGroup>

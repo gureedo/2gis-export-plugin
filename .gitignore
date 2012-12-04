@@ -3,6 +3,8 @@
 *.aps
 *.opensdf
 *.sdf
-Debug
+build
 Release
+Debug
+bin
 ipch

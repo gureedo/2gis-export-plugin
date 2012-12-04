@@ -19,21 +19,33 @@
 #include "OrgSearchControl.h"
 #include "OrgDirectoryCustomController.h"
 
-GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance(
-	const ControlAppearanceParams &appearance,
-	const GrymCore::IGrymObjectFactory2Ptr &factory )
+GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance(	const CPluginInfo &pi )
 {
 	ATL::CComObject<COrgSearchControl> *obj;
 	ATLVERIFY(S_OK == ATL::CComObject<COrgSearchControl>::CreateInstance(&obj));
 	GrymCore::ISearchGroupControlPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
-	obj->SetPlacement(appearance.placement_code);
-	obj->SetAppearance(appearance.tag, appearance.caption, appearance.description, appearance.icon);
-
-	obj->AdjustEditControl(factory);
+	obj->AdjustEditControl(pi.baseView->Factory);
 
 	return rv;
+}
+
+static const _bstr_t empty_bstr = OLESTR("");
+static const _bstr_t tag = OLESTR("FirstAidKit.MainTab.SearchControl");
+static const _bstr_t placement_code =
+	OLESTR("<control_pos>")
+	OLESTR("<size min_width=\"150\" max_width=\"300\" height_in_rows=\"1\" />") 
+	OLESTR("<position column_id=\"100SearchGroup\" row_id=\"500MyRowByID\" order_in_row=\"1\" />")
+	OLESTR("</control_pos>");
+
+COrgSearchControl::COrgSearchControl()
+	: ControlBase(placement_code, tag, empty_bstr, empty_bstr)
+{
+}
+
+COrgSearchControl::~COrgSearchControl()
+{
 }
 
 void COrgSearchControl::AdjustEditControl( const GrymCore::IGrymObjectFactory2Ptr &factory )
@@ -132,7 +144,7 @@ STDMETHODIMP COrgSearchControl::get_SearchCaption( BSTR *pVal )
 		if ( !pVal )
 			return E_POINTER;
 
-		*pVal = _bstr_t(_T("Пользовательский поиск")).Detach();
+		*pVal = _bstr_t(_T("User search")).Detach();
 
 		return S_OK;
 	} catch (...) {

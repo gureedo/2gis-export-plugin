@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:Deployment"
+"ProjectName" = "8:Setup"
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
@@ -19,12 +19,6 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
-        "Entry"
-        {
-        "MsmKey" = "8:_663C4B12276B4C16A2CF7E549A958621"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
     }
     "Configurations"
     {
@@ -33,7 +27,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\Deployment.msi"
+        "OutputFilename" = "8:Debug\\setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -50,6 +44,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
         "Release"
@@ -57,7 +64,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\2gis-fak-setup.msi"
+        "OutputFilename" = "8:Release\\setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -137,7 +144,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_1012A027DE4E4A54A42BE58894D34480"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]\\2gis\\3.0\\Plugins"
+            "DefaultLocation" = "8:[ProgramFilesFolder]\\2gis"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -184,20 +191,20 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:FirstAidKit for 2gis"
+        "ProductName" = "8:First Aid Kit"
         "ProductCode" = "8:{A55EA314-33F6-4FC0-82A8-AE49CD6017E0}"
-        "PackageCode" = "8:{10B07B88-ACA4-4AAD-9EC1-0F2AFB0DEB12}"
+        "PackageCode" = "8:{55C7B959-6F9A-4292-9B81-CEBF84E76D14}"
         "UpgradeCode" = "8:{ABADD8FC-0BE2-4849-B6DA-DC410551B005}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "InstallAllUsers" = "11:FALSE"
+        "InstallAllUsers" = "11:TRUE"
         "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:gureedo"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:2gis FirstAidKit plugin"
+        "Title" = "8:2gis First Aid Kit plugin"
         "Subject" = "8:"
         "ARPCONTACT" = "8:gureedo"
         "Keywords" = "8:"
@@ -705,9 +712,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_663C4B12276B4C16A2CF7E549A958621"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_562966309AA84415AD24564C514D59DE"
             {
-            "SourcePath" = "8:..\\Release\\FirstAidKit.dll"
+            "SourcePath" = "8:"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_F778022BF36F44E3B264AAC78C428FEF"
@@ -725,7 +732,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:Release|Win32"
+            "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{18CD78BC-D328-481C-8B1C-90404874EBB6}"
             "ShowKeyOutput" = "11:TRUE"

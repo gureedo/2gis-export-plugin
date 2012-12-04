@@ -17,21 +17,18 @@
       <UniqueIdentifier>{6d4d50b2-1ff9-4980-a2c0-7d0644eddddb}</UniqueIdentifier>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\GrymCommon">
+      <UniqueIdentifier>{b71ff950-ccb7-4846-b699-a739a313070d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GrymCommon">
+      <UniqueIdentifier>{ebe82805-8f2d-4fb1-935a-5adb439de895}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PluginImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ControlAppearanceBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ControlBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DllMain.cpp">
@@ -49,13 +46,25 @@
     <ClCompile Include="OrgDirectoryCustomController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GrymApiBase.cpp">
+      <Filter>Source Files\GrymCommon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstAidKit.dgxpi">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="FirstAidKit.def">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\export.png">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -66,18 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlAppearanceBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlAppearanceParams.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlContainerBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
@@ -95,8 +92,14 @@
     <ClInclude Include="OrgDirectoryCustomController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MenuCommand.h">
+    <ClInclude Include="Util.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GrymApiBase.h">
+      <Filter>Header Files\GrymCommon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

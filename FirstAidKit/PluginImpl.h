@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "GrymApiBase.h"
+
 class ATL_NO_VTABLE CPluginImpl
 	: public ATL::CComObjectRootEx<ATL::CComSingleThreadModel>
 	, public GrymCore::IGrymPlugin
@@ -38,10 +40,16 @@ public: // GrymCore::IGrymPlugin
 public: // GrymCore::IGrymPluginInfo
 	STDMETHOD(get_XMLInfo)( BSTR *pVal );
 
+public:
+	CPluginInfo pi;
+
 private:
-	GrymCore::IGrymPtr grymAppPtr_;
-	GrymCore::IBaseViewThreadPtr baseViewPtr_;
+	// search group stuff
 	GrymCore::IStdDirectoryCustomControllerPtr customDirController_;
 	GrymCore::ISearchRibbonGroupPtr searchGroup_;
-	GrymCore::ISearchGroupControlPtr searchControl_;
+	GrymCore::ISearchGroupControlPtr ctrlSearch_;
+
+	// tools group stuff
+	GrymCore::ISearchRibbonGroupPtr toolsGroup_;
+	GrymCore::ICommandActionPtr cmdExport_;
 };
