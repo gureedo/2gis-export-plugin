@@ -18,6 +18,7 @@
 #include "resource.h"
 #include "Util.h"
 #include "CmdExport.h"
+#include "DlgExport.h"
 
 GrymCore::ICommandActionPtr CCmdExport::CreateInstance( const CPluginInfo &pi )
 {
@@ -46,7 +47,9 @@ CCmdExport::~CCmdExport()
 STDMETHODIMP CCmdExport::raw_OnCommand()
 {
 	try {
-		// do stuff here
+		CDlgExport dlg;
+		
+		dlg.DoModal();
 
 		return S_OK;
 	} catch (...) {

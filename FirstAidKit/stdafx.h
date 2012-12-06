@@ -14,6 +14,7 @@
 #include <atlwin.h>
 #include <atlsafe.h>
 
-
+#define _WTL_NO_CSTRING
+#include <atlapp.h>
 
 #import "libid:7AA02C95-0B4A-43aa-92D8-BA40511A7F3F" rename("RemoveDirectory", "GrymRemoveDirectory")

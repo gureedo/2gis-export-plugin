@@ -4,6 +4,7 @@
 *.opensdf
 *.sdf
 build
+WTL
 Release
 Debug
 bin

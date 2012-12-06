@@ -128,6 +128,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DlgExport.cpp" />
     <ClCompile Include="GrymApiBase.cpp" />
     <ClCompile Include="CmdExport.cpp" />
     <ClCompile Include="OrgDataRowFilter.cpp" />
@@ -145,10 +146,10 @@
   <ItemGroup>
     <None Include="FirstAidKit.def" />
     <None Include="FirstAidKit.dgxpi" />
-    <None Include="png2.png" />
     <None Include="res\export.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DlgExport.h" />
     <ClInclude Include="GrymApiBase.h" />
     <ClInclude Include="CmdExport.h" />
     <ClInclude Include="OrgDataRowFilter.h" />

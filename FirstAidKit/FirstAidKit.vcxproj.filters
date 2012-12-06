@@ -55,6 +55,9 @@
     <ClCompile Include="GrymApiBase.cpp">
       <Filter>Source Files\GrymCommon</Filter>
     </ClCompile>
+    <ClCompile Include="DlgExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstAidKit.dgxpi">
@@ -66,7 +69,6 @@
     <None Include="res\export.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="png2.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PluginImpl.h">
@@ -101,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="GrymApiBase.h">
       <Filter>Header Files\GrymCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgExport.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
