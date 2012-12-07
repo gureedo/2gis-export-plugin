@@ -14,22 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#pragma once
+#include "stdafx.h"
+#include "PluginInfo.h"
 
-#include "GrymApiBase.h"
-
-class ATL_NO_VTABLE CCmdExport
-	: public VisibleCommandBase
-{
-public:
-	static GrymCore::ICommandActionPtr CreateInstance();
-
-protected:
-	CCmdExport();
-
-public:
-	~CCmdExport();
-
-public: //ICommandAction
-	STDMETHOD(raw_OnCommand)(void);
-};
+CPluginInfo g_pi;

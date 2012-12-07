@@ -24,7 +24,7 @@ class ATL_NO_VTABLE COrgSearchControl
 	, public GrymCore::ISearchGroupControl
 {
 public:
-	static GrymCore::ISearchGroupControlPtr CreateInstance( const CPluginInfo &pi );
+	static GrymCore::ISearchGroupControlPtr CreateInstance();
 
 	~COrgSearchControl();
 

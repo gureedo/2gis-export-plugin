@@ -18,8 +18,9 @@
 #include <sstream>
 #include "OrgSearchControl.h"
 #include "OrgDirectoryCustomController.h"
+#include "PluginInfo.h"
 
-GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance(	const CPluginInfo &pi )
+GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance()
 {
 	ATL::CComObject<COrgSearchControl> *obj;
 	ATLVERIFY(S_OK == ATL::CComObject<COrgSearchControl>::CreateInstance(&obj));
@@ -33,7 +34,7 @@ GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance(	const CPlugi
 		OLESTR("<position column_id=\"100SearchGroup\" row_id=\"500MyRowByID\" order_in_row=\"1\" />")
 		OLESTR("</control_pos>");	
 	
-	obj->AdjustEditControl(pi.baseView->Factory);
+	obj->AdjustEditControl(g_pi.baseView->Factory);
 
 	return rv;
 }

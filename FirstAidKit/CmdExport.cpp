@@ -19,8 +19,9 @@
 #include "Util.h"
 #include "CmdExport.h"
 #include "DlgExport.h"
+#include "PluginInfo.h"
 
-GrymCore::ICommandActionPtr CCmdExport::CreateInstance( const CPluginInfo &pi )
+GrymCore::ICommandActionPtr CCmdExport::CreateInstance()
 {
 	ATL::CComObject<CCmdExport> *obj;
 	ATLVERIFY(S_OK == ATL::CComObject<CCmdExport>::CreateInstance(&obj));
@@ -31,7 +32,7 @@ GrymCore::ICommandActionPtr CCmdExport::CreateInstance( const CPluginInfo &pi )
 	obj->placement_code_ = OLESTR("0001CmdExport:0");
 	obj->caption_ = OLESTR("Export");
 	obj->description_ = OLESTR("DESCRIPTION");
-	obj->icon_ = Util::LoadResourceRaster(pi.baseView->Factory, IDB_EXPORT);
+	obj->icon_ = Util::LoadResourceRaster(g_pi.baseView->Factory, IDB_EXPORT);
 
 	return rv;
 }

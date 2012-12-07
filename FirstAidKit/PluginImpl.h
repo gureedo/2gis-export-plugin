@@ -40,9 +40,6 @@ public: // GrymCore::IGrymPlugin
 public: // GrymCore::IGrymPluginInfo
 	STDMETHOD(get_XMLInfo)( BSTR *pVal );
 
-public:
-	CPluginInfo pi;
-
 private:
 	// search group stuff
 	GrymCore::IStdDirectoryCustomControllerPtr customDirController_;

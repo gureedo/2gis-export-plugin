@@ -21,6 +21,7 @@
 #include "OrgSearchControl.h"
 #include "OrgDirectoryCustomController.h"
 #include "CmdExport.h"
+#include "PluginInfo.h"
 
 GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 {
@@ -33,16 +34,16 @@ GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBaseViewThread *pBaseView )
 {
 	try {
-		pi.grymApp = pRoot;
-		pi.baseView = pBaseView;
+		g_pi.grymApp = pRoot;
+		g_pi.baseView = pBaseView;
 
 		GrymCore::IStdDirectoryCustomControllerContainerPtr controllerContainer =
-			pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
+			g_pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
 
 		customDirController_ = COrgDirectoryCustomController::CreateInstance();
 		controllerContainer->RegisterController(customDirController_);
 
-		GrymCore::IBaseViewFramePtr baseViewFrame = pi.baseView->GetFrame();
+		GrymCore::IBaseViewFramePtr baseViewFrame = g_pi.baseView->GetFrame();
 		GrymCore::IRibbonBarPtr ribbonBar = baseViewFrame->GetMainRibbonBar();
 
 		// create own tab
@@ -71,7 +72,7 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 			OLESTR("Поиск по подсроке в организации"),
 			OLESTR("Вы искали:"));
 
-		ctrlSearch_ = COrgSearchControl::CreateInstance(pi);
+		ctrlSearch_ = COrgSearchControl::CreateInstance();
 		GrymCore::IControlSetPtr(searchGroup_)->AddControl(ctrlSearch_);
 
 		//////////////////////////////////////////////////////////////////////////
@@ -84,7 +85,7 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 			toolsGroupTag, toolsGroupPlacementCode, toolsGroupTitle);
 
 		// export button
-		cmdExport_ = CCmdExport::CreateInstance(pi);
+		cmdExport_ = CCmdExport::CreateInstance();
 		GrymCore::IControlSetPtr(toolsGroup_)->AddControl(cmdExport_);
 
 		return S_OK;
@@ -99,7 +100,7 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 	try {
 		if ( NULL != customDirController_ ) {
 			GrymCore::IStdDirectoryCustomControllerContainerPtr controllerContainer =
-				pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
+				g_pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
 			controllerContainer->UnregisterController(customDirController_);
 		}
 		
@@ -114,8 +115,8 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 		searchGroup_ = NULL;
 		toolsGroup_ = NULL;
 		customDirController_ = NULL;
-		pi.baseView = NULL;
-		pi.grymApp = NULL;
+		g_pi.baseView = NULL;
+		g_pi.grymApp = NULL;
 	} catch(...) {
 	}
 

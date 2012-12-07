@@ -58,6 +58,9 @@
     <ClCompile Include="DlgExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PluginInfo.cpp">
+      <Filter>Source Files\GrymCommon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstAidKit.dgxpi">
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="DlgExport.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginInfo.h">
+      <Filter>Header Files\GrymCommon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

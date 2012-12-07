@@ -16,40 +16,11 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-
-class CDlgExport
-	: public CDialogImpl<CDlgExport>
+class CPluginInfo
 {
 public:
-	CDlgExport();
-
-	enum { IDD = IDD_EXPORT };
-
-	struct TableInfo {
-		std::wstring name;
-		std::wstring description;
-		TableInfo( const std::wstring &name, const std::wstring &description )
-			: name(name)
-			, description(description)
-		{
-		}
-	};
-
-	CCheckListViewCtrl m_wndTableList;
-
-	BEGIN_MSG_MAP(CDlgExport)
-		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
-		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
-	END_MSG_MAP()
-
-
-	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-
-private:
-	std::vector<TableInfo> m_tables;
+	GrymCore::IGrymPtr grymApp;
+	GrymCore::IBaseViewThreadPtr baseView;
 };
 
-
+extern CPluginInfo g_pi;
