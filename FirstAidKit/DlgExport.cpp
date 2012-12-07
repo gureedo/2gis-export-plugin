@@ -16,7 +16,6 @@
 
 #include "stdafx.h"
 #include <sstream>
-#include "resource.h"
 #include "DlgExport.h"
 #include "PluginInfo.h"
 
@@ -47,15 +46,29 @@ CDlgExport::CDlgExport()
 	m_tables.push_back(TableInfo(_T("grym_address"), _T("Address (common)")));
 }
 
+CDlgExport::~CDlgExport()
+{
+	m_hWnd = NULL;
+}
+
 LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/ )
 {
-	m_wndTableList.Attach(GetDlgItem(IDC_TABLES));
+	m_wndTableList.SubclassWindow(GetDlgItem(IDC_TABLES));
 
-	m_wndTableList.AddColumn(_T("Table"), 0);
-	m_wndTableList.AddColumn(_T("Count"), 1);
-	m_wndTableList.AddColumn(_T("Description"), 2);
+	m_wndTableList.AddColumn(_T("Name"), 0, -1, LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM, LVCFMT_LEFT);
+	m_wndTableList.AddColumn(_T("Description"), 1, -1, LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM, LVCFMT_LEFT);
+	m_wndTableList.AddColumn(_T("Count"), 2, -1, LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM, LVCFMT_RIGHT);
 
-	for ( auto it=m_tables.cbegin(); it != m_tables.cend(); ++it ) {
+	LVCOLUMN lvc = { 0 };
+	lvc.mask = LVCF_WIDTH;
+	lvc.cx = 150;
+	m_wndTableList.SetColumn(0, &lvc);
+	lvc.cx = 150;
+	m_wndTableList.SetColumn(1, &lvc);
+	lvc.cx = 100;
+	m_wndTableList.SetColumn(2, &lvc);
+
+	for ( auto it = m_tables.cbegin(); it != m_tables.cend(); ++it ) {
 		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(it->name.c_str()));
 		wstringstream wss;
 
@@ -63,8 +76,8 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 		wstring recCountStr = wss.str();
 
 		m_wndTableList.AddItem(0, 0, it->name.c_str());
-		m_wndTableList.AddItem(0, 1, recCountStr.c_str());
-		m_wndTableList.AddItem(0, 2, it->description.c_str());
+		m_wndTableList.AddItem(0, 1, it->description.c_str());
+		m_wndTableList.AddItem(0, 2, recCountStr.c_str());
 	}
 
 	return TRUE;
@@ -72,6 +85,29 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 
 LRESULT CDlgExport::OnCancel( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 {
+	m_wndTableList.UnsubclassWindow();
 	EndDialog(wID);
+	return 0;
+}
+
+LRESULT CDlgExport::OnSelectExportFolder( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
+{
+	CFolderDialog dlgFolder;
+
+	if ( dlgFolder.DoModal(*this) == IDOK ) {
+		SetDlgItemText(IDC_DSTDIR, dlgFolder.GetFolderPath());
+	}
+
+	return 0;
+}
+
+LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
+{
+	BSTR bstrBuf;
+	wstring dstDir;
+	GetDlgItemText(IDC_DSTDIR, bstrBuf);
+	dstDir = bstrBuf;
+	SysFreeString(bstrBuf);
+
 	return 0;
 }

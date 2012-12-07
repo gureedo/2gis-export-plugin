@@ -18,15 +18,30 @@
 
 #include <vector>
 #include <string>
+#include "resource.h"
 
 class CDlgExport
 	: public CDialogImpl<CDlgExport>
 {
 public:
 	CDlgExport();
+	virtual ~CDlgExport();
 
 	enum { IDD = IDD_EXPORT };
 
+	BEGIN_MSG_MAP(CDlgExport)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+		COMMAND_ID_HANDLER(IDC_BTNSELFOLDER, OnSelectExportFolder)
+		COMMAND_ID_HANDLER(IDC_BTNEXPORT, OnExport)
+	END_MSG_MAP()
+
+	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSelectExportFolder(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnExport(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+private:
 	struct TableInfo {
 		std::wstring name;
 		std::wstring description;
@@ -37,19 +52,7 @@ public:
 		}
 	};
 
-	CCheckListViewCtrl m_wndTableList;
-
-	BEGIN_MSG_MAP(CDlgExport)
-		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
-		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
-	END_MSG_MAP()
-
-
-	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-
-private:
 	std::vector<TableInfo> m_tables;
+
+	CCheckListViewCtrl m_wndTableList;
 };
-
-
