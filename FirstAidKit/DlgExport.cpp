@@ -16,6 +16,9 @@
 
 #include "stdafx.h"
 #include <sstream>
+#include <fstream>
+#include <locale>
+#include <codecvt>
 #include "DlgExport.h"
 #include "PluginInfo.h"
 
@@ -24,26 +27,27 @@ using namespace std;
 CDlgExport::CDlgExport()
 {
 	// organizations tables
-	m_tables.push_back(TableInfo(_T("grym_org"), _T("Organization")));
-	m_tables.push_back(TableInfo(_T("grym_rub1"), _T("Rubric 1")));
-	m_tables.push_back(TableInfo(_T("grym_rub2"), _T("Rubric 2")));
-	m_tables.push_back(TableInfo(_T("grym_rub3"), _T("Rubric 3")));
+	m_tables.push_back(new TableInfo(_T("grym_org"), _T("Organization"), false));
+	m_tables.push_back(new TableInfo(_T("grym_org_fil"), _T("Organization filials"), true));
+	m_tables.push_back(new TableInfo(_T("grym_rub1"), _T("Rubric 1"), false));
+	m_tables.push_back(new TableInfo(_T("grym_rub2"), _T("Rubric 2"), false));
+	m_tables.push_back(new TableInfo(_T("grym_rub3"), _T("Rubric 3"), false));
 
 	// map tables
-	m_tables.push_back(TableInfo(_T("grym_map_building"), _T("Buildings")));
-	m_tables.push_back(TableInfo(_T("grym_map_street"), _T("Streets")));
-	m_tables.push_back(TableInfo(_T("grym_map_district"), _T("Disctincts")));
-	m_tables.push_back(TableInfo(_T("grym_map_microdistrict"), _T("Microdistincts")));
-	m_tables.push_back(TableInfo(_T("grym_map_city"), _T("Cities (secondrary)")));
-	m_tables.push_back(TableInfo(_T("grym_map_rwstation"), _T("Railroad stations")));
-	m_tables.push_back(TableInfo(_T("grym_map_stationbay"), _T("Station bays")));
-	m_tables.push_back(TableInfo(_T("grym_map_territory"), _T("Territories")));
-	m_tables.push_back(TableInfo(_T("grym_map_sight"), _T("Sights")));
+	m_tables.push_back(new TableInfo(_T("grym_map_building"), _T("Buildings"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_street"), _T("Streets"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_district"), _T("Disctincts"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_microdistrict"), _T("Microdistincts"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_city"), _T("Cities (secondrary)"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_stationbay"), _T("Station bays"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_territory"), _T("Territories"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
 
 	// common tables
-	m_tables.push_back(TableInfo(_T("grym_city"), _T("Cities (common)")));
-	m_tables.push_back(TableInfo(_T("grym_street"), _T("Streets (common)")));
-	m_tables.push_back(TableInfo(_T("grym_address"), _T("Address (common)")));
+	m_tables.push_back(new TableInfo(_T("grym_city"), _T("Cities (common)"), false));
+	m_tables.push_back(new TableInfo(_T("grym_street"), _T("Streets (common)"), false));
+	m_tables.push_back(new TableInfo(_T("grym_address"), _T("Address (common)"), false));
 }
 
 CDlgExport::~CDlgExport()
@@ -69,15 +73,22 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 	m_wndTableList.SetColumn(2, &lvc);
 
 	for ( auto it = m_tables.cbegin(); it != m_tables.cend(); ++it ) {
-		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(it->name.c_str()));
-		wstringstream wss;
+		TableInfo *info = *it;
 
-		wss << table->GetRecordCount();
-		wstring recCountStr = wss.str();
+		wstring recCountStr;
+		if ( !info->isVirtual ) {
+			wstringstream ss;
+			GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(info->name.c_str()));
+			ss << table->GetRecordCount();
+			recCountStr = ss.str();
+		} else {
+			recCountStr = _T("0");
+		}
 
-		m_wndTableList.AddItem(0, 0, it->name.c_str());
-		m_wndTableList.AddItem(0, 1, it->description.c_str());
+		int idx = m_wndTableList.AddItem(0, 0, info->name.c_str());
+		m_wndTableList.AddItem(0, 1, info->description.c_str());
 		m_wndTableList.AddItem(0, 2, recCountStr.c_str());
+		m_wndTableList.SetItemData(idx, (DWORD_PTR)info);
 	}
 
 	return TRUE;
@@ -103,11 +114,64 @@ LRESULT CDlgExport::OnSelectExportFolder( WORD /*wNotifyCode*/, WORD /*wID*/, HW
 
 LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 {
-	BSTR bstrBuf;
-	wstring dstDir;
-	GetDlgItemText(IDC_DSTDIR, bstrBuf);
-	dstDir = bstrBuf;
-	SysFreeString(bstrBuf);
+	locale utf8_locale(locale("", locale::ctype), new codecvt_utf8<wchar_t>);
+
+	CString buf;
+	GetDlgItemText(IDC_DSTDIR, buf);
+	wstring dstDir = buf;
+
+	if ( dstDir.empty() ) {
+		MessageBox(_T("Destination folder not selected."));
+		return 0;
+	}
+
+	if ( *dstDir.rbegin() != _T('\\') )
+		dstDir += _T("\\");
+
+	int idx = -1;
+	while ( (idx = m_wndTableList.GetNextItem(idx, LVNI_ALL)) != -1 ) {
+		if ( !m_wndTableList.GetCheckState(idx) )
+			continue;
+
+		TableInfo *info = (TableInfo *)m_wndTableList.GetItemData(idx);
+		if ( !info )
+			continue;
+
+		m_wndTableList.SelectItem(idx);
+
+		wstring fileName = dstDir + info->name + _T(".csv");
+		wofstream csvStream;
+		csvStream.open(fileName, ios::out|ios::trunc );
+		if ( csvStream.fail() ) {
+			wstringstream ss;
+			ss << _T("Failed to open \"") << fileName << _T("\" for writing!");
+			MessageBox(ss.str().c_str());
+			continue;
+		}
+		csvStream.imbue( utf8_locale );
+		
+		if ( info->name == _T("grym_org") ) {
+			GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(info->name.c_str()));
+			long count = table->GetRecordCount();
+			long i = 0;
+		
+			csvStream << _T("org_id;org_stable_id;org_name") << endl;
+
+			while ( ++i <= count ) {
+				GrymCore::IDataRowPtr row = table->GetRecord(i);
+
+				csvStream << i;
+				csvStream << _T(";");
+				csvStream << (int)row->GetValue(_bstr_t(OLESTR("stable_id")));
+				csvStream << _T(";");
+				csvStream << (_bstr_t)row->GetValue(_bstr_t(OLESTR("name")));
+				csvStream << endl;
+			}
+		}
+
+		csvStream.close();
+
+	}
 
 	return 0;
 }

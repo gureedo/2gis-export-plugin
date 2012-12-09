@@ -45,14 +45,16 @@ private:
 	struct TableInfo {
 		std::wstring name;
 		std::wstring description;
-		TableInfo( const std::wstring &name, const std::wstring &description )
+		bool isVirtual;
+		TableInfo( const std::wstring &name, const std::wstring &description, bool isVirtual )
 			: name(name)
 			, description(description)
+			, isVirtual(isVirtual)
 		{
 		}
 	};
 
-	std::vector<TableInfo> m_tables;
+	std::vector<TableInfo*> m_tables;
 
 	CCheckListViewCtrl m_wndTableList;
 };
