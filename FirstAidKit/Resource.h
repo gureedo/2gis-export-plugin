@@ -11,6 +11,9 @@
 #define IDC_BTNSELFOLDER                203
 #define IDC_BTNSELDIR                   203
 #define IDC_BTNEXPORT                   204
+#define IDC_PROGRESS                    205
+#define IDC_LIST2                       206
+#define IDC_LOG                         206
 
 // Next default values for new objects
 // 
@@ -18,7 +21,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        204
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         205
+#define _APS_NEXT_CONTROL_VALUE         207
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

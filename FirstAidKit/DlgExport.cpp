@@ -19,6 +19,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include <algorithm>
 #include "DlgExport.h"
 #include "PluginInfo.h"
 
@@ -28,7 +29,7 @@ CDlgExport::CDlgExport()
 {
 	// organizations tables
 	m_tables.push_back(new TableInfo(_T("grym_org"), _T("Organization"), false));
-	m_tables.push_back(new TableInfo(_T("grym_org_fil"), _T("Organization filials"), true));
+	m_tables.push_back(new TableInfo(_T("grym_org_fil"), _T("Organization suboffices"), true));
 	m_tables.push_back(new TableInfo(_T("grym_rub1"), _T("Rubric 1"), false));
 	m_tables.push_back(new TableInfo(_T("grym_rub2"), _T("Rubric 2"), false));
 	m_tables.push_back(new TableInfo(_T("grym_rub3"), _T("Rubric 3"), false));
@@ -52,12 +53,16 @@ CDlgExport::CDlgExport()
 
 CDlgExport::~CDlgExport()
 {
+	for_each(m_tables.begin(), m_tables.end(), [] (TableInfo *ti) { delete ti; });
+	m_tables.clear();
+	// WTL bug?
 	m_hWnd = NULL;
 }
 
 LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/ )
 {
 	m_wndTableList.SubclassWindow(GetDlgItem(IDC_TABLES));
+	m_wndLog.Attach(GetDlgItem(IDC_LOG));
 
 	m_wndTableList.AddColumn(_T("Name"), 0, -1, LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM, LVCFMT_LEFT);
 	m_wndTableList.AddColumn(_T("Description"), 1, -1, LVCF_FMT | LVCF_TEXT | LVCF_SUBITEM, LVCFMT_LEFT);
@@ -77,10 +82,14 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 
 		wstring recCountStr;
 		if ( !info->isVirtual ) {
-			wstringstream ss;
-			GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(info->name.c_str()));
-			ss << table->GetRecordCount();
-			recCountStr = ss.str();
+			try {
+				wstringstream ss;
+				GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(info->name.c_str());
+				ss << table->GetRecordCount();
+				recCountStr = ss.str();
+			} catch (...) {
+				recCountStr = _T("0");
+			}
 		} else {
 			recCountStr = _T("0");
 		}
@@ -89,6 +98,7 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 		m_wndTableList.AddItem(0, 1, info->description.c_str());
 		m_wndTableList.AddItem(0, 2, recCountStr.c_str());
 		m_wndTableList.SetItemData(idx, (DWORD_PTR)info);
+		m_wndTableList.SetCheckState(idx, TRUE);
 	}
 
 	return TRUE;
@@ -97,6 +107,8 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 LRESULT CDlgExport::OnCancel( WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 {
 	m_wndTableList.UnsubclassWindow();
+	m_wndLog.Detach();
+
 	EndDialog(wID);
 	return 0;
 }
@@ -114,64 +126,216 @@ LRESULT CDlgExport::OnSelectExportFolder( WORD /*wNotifyCode*/, WORD /*wID*/, HW
 
 LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/ )
 {
-	locale utf8_locale(locale("", locale::ctype), new codecvt_utf8<wchar_t>);
+	wstring logStr;
+	CString bufStr;
 
-	CString buf;
-	GetDlgItemText(IDC_DSTDIR, buf);
-	wstring dstDir = buf;
+	::EnableWindow(GetDlgItem(IDC_BTNEXPORT), FALSE);
+	::EnableWindow(GetDlgItem(IDCANCEL), FALSE);
+	::EnableWindow(GetDlgItem(IDC_TABLES), FALSE);
+	m_wndLog.ResetContent();
+
+	GetDlgItemText(IDC_DSTDIR, bufStr);
+	wstring dstDir = bufStr;
 
 	if ( dstDir.empty() ) {
-		MessageBox(_T("Destination folder not selected."));
+		m_wndLog.AddString(_T("Destination folder not selected."));
 		return 0;
 	}
 
 	if ( *dstDir.rbegin() != _T('\\') )
-		dstDir += _T("\\");
+		dstDir += _T('\\');
 
-	int idx = -1;
-	while ( (idx = m_wndTableList.GetNextItem(idx, LVNI_ALL)) != -1 ) {
-		if ( !m_wndTableList.GetCheckState(idx) )
+	int tableIdx = -1;
+	while ( (tableIdx = m_wndTableList.GetNextItem(tableIdx, LVNI_ALL)) != -1 ) {
+		if ( !m_wndTableList.GetCheckState(tableIdx) )
 			continue;
 
-		TableInfo *info = (TableInfo *)m_wndTableList.GetItemData(idx);
-		if ( !info )
-			continue;
+		TableInfo *info = (TableInfo *)m_wndTableList.GetItemData(tableIdx);
 
-		m_wndTableList.SelectItem(idx);
+		m_wndTableList.SelectItem(tableIdx);
+		logStr = _T("Processing table ");
+		logStr += info->name;
+		m_wndLog.AddString(logStr.c_str());
 
-		wstring fileName = dstDir + info->name + _T(".csv");
-		wofstream csvStream;
-		csvStream.open(fileName, ios::out|ios::trunc );
-		if ( csvStream.fail() ) {
-			wstringstream ss;
-			ss << _T("Failed to open \"") << fileName << _T("\" for writing!");
-			MessageBox(ss.str().c_str());
-			continue;
+		wstring csvFileName = dstDir + info->name + _T(".csv");
+
+		try {
+			exportTable(info->name, csvFileName);
+		} catch(wofstream::failure e) {
+			logStr = _T("Error: ");
+			logStr += CA2W(e.what());
+			m_wndLog.AddString(logStr.c_str());
+		} catch (...) {
+			m_wndLog.AddString(_T("Unknown error occured!"));
 		}
-		csvStream.imbue( utf8_locale );
-		
-		if ( info->name == _T("grym_org") ) {
-			GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(_bstr_t(info->name.c_str()));
-			long count = table->GetRecordCount();
-			long i = 0;
-		
-			csvStream << _T("org_id;org_stable_id;org_name") << endl;
-
-			while ( ++i <= count ) {
-				GrymCore::IDataRowPtr row = table->GetRecord(i);
-
-				csvStream << i;
-				csvStream << _T(";");
-				csvStream << (int)row->GetValue(_bstr_t(OLESTR("stable_id")));
-				csvStream << _T(";");
-				csvStream << (_bstr_t)row->GetValue(_bstr_t(OLESTR("name")));
-				csvStream << endl;
-			}
-		}
-
-		csvStream.close();
-
 	}
 
+	::EnableWindow(GetDlgItem(IDC_BTNEXPORT), TRUE);
+	::EnableWindow(GetDlgItem(IDC_TABLES), TRUE);
+	::EnableWindow(GetDlgItem(IDCANCEL), TRUE);
+
 	return 0;
+}
+
+void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring &outFile ) const
+{
+	locale utf8_locale(locale("", locale::ctype), new codecvt_utf8<wchar_t, 0x10ffff, generate_header>);
+	wofstream csvStream(outFile, ios::out|ios::trunc);
+	csvStream.imbue(utf8_locale);
+
+	if ( tableName == _T("grym_org") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_org"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("org_id;org_stable_id;org_name") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			csvStream << idx
+				<< _T(";")
+				<< (int)row->GetValue(OLESTR("stable_id"))
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< endl;
+		}
+	}
+
+	// grym_org_fil
+
+	else if ( tableName == _T("grym_rub1") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_rub1"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("rub1_id;rub1_name") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_rub2") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_rub2"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("rub2_id;rub2_name;rub1_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IDataRowPtr parentRow = row->GetValue(OLESTR("parent"));
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< _T(";")
+				<< parentRow->Index
+				<< endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_rub3") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_rub3"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("rub3_id;rub3_name;rub2_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IDataRowPtr parentRow = row->GetValue(OLESTR("parent"));
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< _T(";")
+				<< parentRow->Index
+				<< endl;
+		}
+	}
+
+	// grym_map_building
+	// grym_map_street
+	// grym_map_district
+	// grym_map_microdistrict
+	// grym_map_city
+	// grym_map_rwstation
+	// grym_map_stationbay
+	// grym_map_territory
+	// grym_map_sight
+
+	else if ( tableName == _T("grym_city") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_city"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("city_id;city_name;type_name;type_name_abbr") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("type_name"))
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("type_name_abbr"))
+				<< endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_street") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_street"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("street_id;street_name;city_id;map_street_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IDataRowPtr cityRow = row->GetValue(OLESTR("city"));
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("name"))
+				<< _T(";")
+				<< cityRow->Index
+				<< _T(";");
+			try {
+				GrymCore::IDataRowPtr mapStreetRow = row->GetValue(OLESTR("feature"));
+				csvStream << mapStreetRow->Index;
+			} catch (...) {
+			}
+			csvStream << endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_address") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_address"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("address_id;address_number;street_id;map_building_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IDataRowPtr streetRow = row->GetValue(OLESTR("street"));
+			csvStream << idx
+				<< _T(";")
+				<< (_bstr_t)row->GetValue(OLESTR("number"))
+				<< _T(";")
+				<< streetRow->Index
+				<< _T(";");
+			try {
+				GrymCore::IDataRowPtr mapBuildingRow = row->GetValue(OLESTR("feature"));
+				csvStream << mapBuildingRow->Index;
+			} catch (...) {
+			}
+			csvStream << endl;
+		}
+	}
+
+	csvStream.close();
 }

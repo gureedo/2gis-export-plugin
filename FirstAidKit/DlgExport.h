@@ -57,4 +57,7 @@ private:
 	std::vector<TableInfo*> m_tables;
 
 	CCheckListViewCtrl m_wndTableList;
+	CListBox m_wndLog;
+
+	void exportTable( const std::wstring &tableName, const std::wstring &outFile ) const;
 };
