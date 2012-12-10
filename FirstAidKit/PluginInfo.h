@@ -21,6 +21,8 @@ class CPluginInfo
 public:
 	GrymCore::IGrymPtr grymApp;
 	GrymCore::IBaseViewThreadPtr baseView;
+
+	GrymCore::IMapCoordinateTransformationGeoPtr coordinateTranslator() const;
 };
 
 extern CPluginInfo g_pi;

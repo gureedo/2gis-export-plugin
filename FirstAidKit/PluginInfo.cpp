@@ -15,6 +15,20 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "stdafx.h"
+#include <string>
 #include "PluginInfo.h"
 
 CPluginInfo g_pi;
+
+GrymCore::IMapCoordinateTransformationGeoPtr CPluginInfo::coordinateTranslator() const
+{
+	IUnknownPtr pTrans = baseView->Frame->Map->CoordinateTransformation;
+	GrymCore::IMapCoordinateTransformationGeoPtr pGEO;
+	if ( pTrans ) {
+		pTrans->QueryInterface(__uuidof(GrymCore::IMapCoordinateTransformationGeo), (void**)&pGEO);
+		if ( !pGEO )
+			throw std::wstring(_T("Can't query IMapCoordinateTransformationGeo"));
+	}
+
+	return pGEO;
+}

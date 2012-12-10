@@ -165,6 +165,10 @@ LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 			logStr = _T("Error: ");
 			logStr += CA2W(e.what());
 			m_wndLog.AddString(logStr.c_str());
+		} catch(wstring e) {
+			logStr = _T("Error: ");
+			logStr += e;
+			m_wndLog.AddString(logStr.c_str());
 		} catch (...) {
 			m_wndLog.AddString(_T("Unknown error occured!"));
 		}
@@ -188,7 +192,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("org_id;org_stable_id;org_name") << endl;
+		csvStream << _T("#org_id;org_stable_id;org_name") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -208,7 +212,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("rub1_id;rub1_name") << endl;
+		csvStream << _T("#rub1_id;rub1_name") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -224,7 +228,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("rub2_id;rub2_name;rub1_id") << endl;
+		csvStream << _T("#rub2_id;rub2_name;rub1_id") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -243,7 +247,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("rub3_id;rub3_name;rub2_id") << endl;
+		csvStream << _T("#rub3_id;rub3_name;rub2_id") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -261,7 +265,43 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 	// grym_map_street
 	// grym_map_district
 	// grym_map_microdistrict
-	// grym_map_city
+	
+	else if ( tableName == _T("grym_map_city") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_city"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_city_id;city_id;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+		
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			GrymCore::IDataRowPtr cityRow = row->GetValue(OLESTR("city"));
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << cityRow->Index;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+
 	// grym_map_rwstation
 	// grym_map_stationbay
 	// grym_map_territory
@@ -272,7 +312,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("city_id;city_name;type_name;type_name_abbr") << endl;
+		csvStream << _T("#city_id;city_name;type_name;type_name_abbr;map_city_id") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -283,7 +323,13 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 				<< (_bstr_t)row->GetValue(OLESTR("type_name"))
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("type_name_abbr"))
-				<< endl;
+				<< _T(";");
+			try {
+				GrymCore::IDataRowPtr mapCityRow = row->GetValue(OLESTR("feature"));
+				csvStream << mapCityRow->Index;
+			} catch (...) {
+			}
+			csvStream << endl;
 		}
 	}
 
@@ -292,7 +338,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("street_id;street_name;city_id;map_street_id") << endl;
+		csvStream << _T("#street_id;street_name;city_id;map_street_id") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
@@ -317,7 +363,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		long count = table->GetRecordCount();
 		long idx = 0;
 
-		csvStream << _T("address_id;address_number;street_id;map_building_id") << endl;
+		csvStream << _T("#address_id;address_number;street_id;map_building_id") << endl;
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
