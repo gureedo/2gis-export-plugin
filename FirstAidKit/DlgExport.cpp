@@ -43,6 +43,7 @@ CDlgExport::CDlgExport()
 	m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_stationbay"), _T("Station bays"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_territory"), _T("Territories"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_territory_alias"), _T("Territory aliases"), true));
 	m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
 
 	// common tables
@@ -88,10 +89,10 @@ LRESULT CDlgExport::OnInitDialog( UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPa
 				ss << table->GetRecordCount();
 				recCountStr = ss.str();
 			} catch (...) {
-				recCountStr = _T("0");
+				recCountStr = _T("?");
 			}
 		} else {
-			recCountStr = _T("0");
+			recCountStr = _T("?");
 		}
 
 		int idx = m_wndTableList.AddItem(0, 0, info->name.c_str());
@@ -262,9 +263,123 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 	}
 
 	// grym_map_building
-	// grym_map_street
-	// grym_map_district
-	// grym_map_microdistrict
+	
+	else if ( tableName == _T("grym_map_street") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_street"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_street_id;map_street_name;street_id;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			try {
+				GrymCore::IDataRowPtr streetRow = row->GetValue(OLESTR("street"));
+				csvStream << streetRow->Index;
+			} catch (...) {
+
+			}
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+	
+	else if ( tableName == _T("grym_map_district") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_district"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_district_id;map_district_name;city_id;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			try {
+				GrymCore::IDataRowPtr cityRow = row->GetValue(OLESTR("city"));
+				csvStream << cityRow->Index;
+			} catch (...) {
+			}
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+	
+	else if ( tableName == _T("grym_map_microdistrict") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_microdistrict"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_microdistrict_id;map_microdistrict_name;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
 	
 	else if ( tableName == _T("grym_map_city") ) {
 		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
@@ -274,7 +389,6 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 
 		csvStream << _T("#map_city_id;city_id;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
 		
-
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IMapPointPtr point;
@@ -303,8 +417,87 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 	}
 
 	// grym_map_rwstation
-	// grym_map_stationbay
-	// grym_map_territory
+
+	else if ( tableName == _T("grym_map_stationbay") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_stationbay"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_stationbay_id;map_stationbay_name;coord_x;coord_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_map_territory") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_territory"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_territory_id;map_territory_name;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_map_territory_alias") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_territory"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_territory_id;map_territory_alias") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			int aliasCount = row->GetValue(OLESTR("alias_count"));
+			int aliasIdx = 0;
+			while( ++aliasIdx <= aliasCount ) {
+				wstringstream ss;
+				ss << _T("alias_") << aliasIdx;
+				csvStream << idx;
+				csvStream << _T(";");
+				csvStream << (_bstr_t)row->GetValue(ss.str().c_str());
+				csvStream << endl;
+			}
+		}
+	}
+
 	// grym_map_sight
 
 	else if ( tableName == _T("grym_city") ) {
