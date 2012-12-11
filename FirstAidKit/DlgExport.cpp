@@ -36,15 +36,16 @@ CDlgExport::CDlgExport()
 
 	// map tables
 	m_tables.push_back(new TableInfo(_T("grym_map_building"), _T("Buildings"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_building_addr"), _T("Building addresses"), true));
 	m_tables.push_back(new TableInfo(_T("grym_map_street"), _T("Streets"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_district"), _T("Disctincts"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_microdistrict"), _T("Microdistincts"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_city"), _T("Cities (secondrary)"), false));
-	m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
+	//m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_stationbay"), _T("Station bays"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_territory"), _T("Territories"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_territory_alias"), _T("Territory aliases"), true));
-	m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
+	//m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
 
 	// common tables
 	m_tables.push_back(new TableInfo(_T("grym_city"), _T("Cities (common)"), false));
@@ -173,6 +174,8 @@ LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		} catch (...) {
 			m_wndLog.AddString(_T("Unknown error occured!"));
 		}
+
+		processMessages();
 	}
 
 	::EnableWindow(GetDlgItem(IDC_BTNEXPORT), TRUE);
@@ -206,7 +209,44 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 
-	// grym_org_fil
+	// grym_org_rub3
+
+	else if ( tableName == _T("grym_org_fil") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_org"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#org_id;org_fil_id;map_building_id;addr_extinfo") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			int filCount = row->GetValue(OLESTR("fil_count"));
+			int filIdx = 0;
+			while( ++filIdx <= filCount ) {
+				wstringstream ss;
+				ss << _T("fil_") << filIdx;
+				GrymCore::IDataRowPtr filRow = row->GetValue(ss.str().c_str());
+
+				csvStream << idx;
+				csvStream << _T(";");
+				csvStream << filRow->Index;
+				csvStream << _T(";");
+				try {
+					GrymCore::IDataRowPtr buildingRow = filRow->GetValue(OLESTR("addr_feature"));
+					csvStream << buildingRow->Index;
+				} catch (...) {
+				}
+				csvStream << _T(";");
+				wstring addrExtInfo = (_bstr_t)filRow->GetValue(OLESTR("addr_extinfo"));
+				std::replace(addrExtInfo.begin(), addrExtInfo.end(), _T(';'), _T(','));
+				csvStream << addrExtInfo;
+				csvStream << endl;
+			}
+		}
+	}
+	
+	// grym_org_fil_rub3
+	// grym_org_fil_addr
 
 	else if ( tableName == _T("grym_rub1") ) {
 		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_rub1"));
@@ -262,7 +302,69 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 
-	// grym_map_building
+	else if ( tableName == _T("grym_map_building") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_building"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_building_id;map_building_name;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("purpose"));
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("post_index"));
+			csvStream << _T(";");
+			csvStream << (int)row->GetValue(OLESTR("levels"));
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
+
+	else if ( tableName == _T("grym_map_building_addr") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_building"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_building_id;address_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			int addrCount = row->GetValue(OLESTR("addr_count"));
+			int addrIdx = 0;
+			while( ++addrIdx <= addrCount ) {
+				wstringstream ss;
+				ss << _T("addr_") << addrIdx;
+				GrymCore::IDataRowPtr addrRow = row->GetValue(ss.str().c_str());
+				csvStream << idx;
+				csvStream << _T(";");
+				csvStream << addrRow->Index;
+				csvStream << endl;
+			}
+		}
+	}
 	
 	else if ( tableName == _T("grym_map_street") ) {
 		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
@@ -577,4 +679,13 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 	}
 
 	csvStream.close();
+}
+
+void CDlgExport::processMessages() const
+{
+	MSG msg;
+	while ( PeekMessage(&msg,NULL,NULL,NULL,PM_REMOVE) ) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 }
