@@ -14,22 +14,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#pragma once
+#include "stdafx.h"
+#include <string>
+#include "PluginInfo.h"
 
-struct ControlAppearanceParams
+CPluginInfo g_pi;
+
+GrymCore::IMapCoordinateTransformationGeoPtr CPluginInfo::coordinateTranslator() const
 {
-	_bstr_t placement_code;
-	_bstr_t tag;
-	_bstr_t caption;
-	_bstr_t description;
-	IUnknownPtr icon;
-
-	ControlAppearanceParams()
-	{
-		placement_code = _T("");
-		tag = _T("");
-		caption = _T("");
-		description = _T("");
-		icon = NULL;
+	IUnknownPtr pTrans = baseView->Frame->Map->CoordinateTransformation;
+	GrymCore::IMapCoordinateTransformationGeoPtr pGEO;
+	if ( pTrans ) {
+		pTrans->QueryInterface(__uuidof(GrymCore::IMapCoordinateTransformationGeo), (void**)&pGEO);
+		if ( !pGEO )
+			throw std::wstring(_T("Can't query IMapCoordinateTransformationGeo"));
 	}
-};
+
+	return pGEO;
+}

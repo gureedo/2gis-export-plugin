@@ -3,6 +3,9 @@
 *.aps
 *.opensdf
 *.sdf
-Debug
+build
+WTL
 Release
+Debug
+bin
 ipch

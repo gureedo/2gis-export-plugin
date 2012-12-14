@@ -16,19 +16,20 @@
 
 #pragma once
 
-class ATL_NO_VTABLE ControlContainerBase
-	: public ControlAppearanceBase
-	, public GrymCore::IContainerControl
+#include "GrymApiBase.h"
+
+class ATL_NO_VTABLE CCmdExport
+	: public VisibleCommandBase
 {
+public:
+	static GrymCore::ICommandActionPtr CreateInstance();
+
 protected:
-	ControlContainerBase() {}
-	~ControlContainerBase() {}
+	CCmdExport();
 
-	BEGIN_COM_MAP(ControlContainerBase)
-		COM_INTERFACE_ENTRY(GrymCore::IContainerControl)
-		COM_INTERFACE_ENTRY_CHAIN(ControlAppearanceBase)
-	END_COM_MAP()
+public:
+	~CCmdExport();
 
-public:	//GrymCore::IContainerControl
-	STDMETHOD(get_InternalControl)( IUnknown **pVal ) PURE;
+public: //ICommandAction
+	STDMETHOD(raw_OnCommand)(void);
 };

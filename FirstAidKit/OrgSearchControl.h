@@ -16,28 +16,25 @@
 
 #pragma once
 
-#include "ControlAppearanceBase.h"
-#include "ControlAppearanceParams.h"
+#include "GrymApiBase.h"
 
 class ATL_NO_VTABLE COrgSearchControl
-	: public ControlAppearanceBase
+	: public ControlBase
 	, public GrymCore::IContainerControl
 	, public GrymCore::ISearchGroupControl
 {
 public:
-	static GrymCore::ISearchGroupControlPtr CreateInstance(
-		const ControlAppearanceParams &appearance,
-		const GrymCore::IGrymObjectFactory2Ptr &factory );
+	static GrymCore::ISearchGroupControlPtr CreateInstance();
 
-	~COrgSearchControl() {}
+	~COrgSearchControl();
 
 protected:
-	COrgSearchControl() {}
+	COrgSearchControl();
 
 	BEGIN_COM_MAP(COrgSearchControl)
 		COM_INTERFACE_ENTRY(GrymCore::IContainerControl)
 		COM_INTERFACE_ENTRY(GrymCore::ISearchGroupControl)
-		COM_INTERFACE_ENTRY_CHAIN(ControlAppearanceBase)
+		COM_INTERFACE_ENTRY_CHAIN(ControlBase)
 	END_COM_MAP()
 
 public:	//IContainerControl
