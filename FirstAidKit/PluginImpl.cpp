@@ -15,9 +15,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "StdAfx.h"
+#include "resource.h"
 #include "PluginImpl.h"
+#include "Util.h"
 #include "OrgSearchControl.h"
 #include "OrgDirectoryCustomController.h"
+#include "CmdExport.h"
+#include "PluginInfo.h"
 
 GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 {
@@ -30,16 +34,16 @@ GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBaseViewThread *pBaseView )
 {
 	try {
-		grymAppPtr_ = pRoot;
-		baseViewPtr_ = pBaseView;
+		g_pi.grymApp = pRoot;
+		g_pi.baseView = pBaseView;
 
 		GrymCore::IStdDirectoryCustomControllerContainerPtr controllerContainer =
-			baseViewPtr_->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
+			g_pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
 
 		customDirController_ = COrgDirectoryCustomController::CreateInstance();
 		controllerContainer->RegisterController(customDirController_);
 
-		GrymCore::IBaseViewFramePtr baseViewFrame = baseViewPtr_->GetFrame();
+		GrymCore::IBaseViewFramePtr baseViewFrame = g_pi.baseView->GetFrame();
 		GrymCore::IRibbonBarPtr ribbonBar = baseViewFrame->GetMainRibbonBar();
 
 		// create own tab
@@ -49,7 +53,9 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 		GrymCore::IRibbonTabPtr firstAidTab = ribbonBar->CreateTab(firstAidTabTag, 
 			firstAidTabPlacementCode,firstAidTabTitle);
 
-		// create search group
+		//////////////////////////////////////////////////////////////////////////
+		// Search group
+		//////////////////////////////////////////////////////////////////////////
 		static const _bstr_t searchGroupTag(_T("FirstAidKit.MainTab.SearchGroup"));
 		static const _bstr_t searchGroupPlacementCode(_T("0001SearchGroup:0"));
 		static const _bstr_t searchGroupTitle(_T("Organization search"));
@@ -66,16 +72,21 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 			OLESTR("Поиск по подсроке в организации"),
 			OLESTR("Вы искали:"));
 
-		ControlAppearanceParams appearance;
-		appearance.tag = OLESTR("FirstAidKit.MainTab.SearchControl");
-		appearance.placement_code =
-			OLESTR("<control_pos>")
-				OLESTR("<size min_width=\"150\" max_width=\"300\" height_in_rows=\"1\" />") 
-				OLESTR("<position column_id=\"100SearchGroup\" row_id=\"500MyRowByID\" order_in_row=\"1\" />")
-			OLESTR("</control_pos>");
+		ctrlSearch_ = COrgSearchControl::CreateInstance();
+		GrymCore::IControlSetPtr(searchGroup_)->AddControl(ctrlSearch_);
 
-		searchControl_ = COrgSearchControl::CreateInstance(appearance,	baseViewPtr_->Factory);
-		GrymCore::IControlSetPtr(searchGroup_)->AddControl(searchControl_);
+		//////////////////////////////////////////////////////////////////////////
+		// Tools group
+		//////////////////////////////////////////////////////////////////////////
+		static const _bstr_t toolsGroupTag(_T("FirstAidKit.MainTab.ToolsGroup"));
+		static const _bstr_t toolsGroupPlacementCode(_T("0002ToolsGroup:0"));
+		static const _bstr_t toolsGroupTitle(_T("Tools"));
+		toolsGroup_ = firstAidTab->CreateGroup(GrymCore::RibbonGroupTypeSimple,
+			toolsGroupTag, toolsGroupPlacementCode, toolsGroupTitle);
+
+		// export button
+		cmdExport_ = CCmdExport::CreateInstance();
+		GrymCore::IControlSetPtr(toolsGroup_)->AddControl(cmdExport_);
 
 		return S_OK;
 	} catch(...) {
@@ -89,17 +100,23 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 	try {
 		if ( NULL != customDirController_ ) {
 			GrymCore::IStdDirectoryCustomControllerContainerPtr controllerContainer =
-				baseViewPtr_->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
+				g_pi.baseView->Frame->DirectoryCollection->GetDirectory(OLESTR("Grym.DirPage.Org"));
 			controllerContainer->UnregisterController(customDirController_);
 		}
-		if ( NULL != searchGroup_ && NULL != searchControl_ )
-			GrymCore::IControlSetPtr(searchGroup_)->RemoveControl(searchControl_);
-
-		searchControl_ = NULL;
+		
+		if ( NULL != searchGroup_ && NULL != ctrlSearch_ )
+			GrymCore::IControlSetPtr(searchGroup_)->RemoveControl(ctrlSearch_);
+		
+		if ( NULL != toolsGroup_ && NULL != cmdExport_ )
+			GrymCore::IControlSetPtr(searchGroup_)->RemoveControl(cmdExport_);
+		
+		ctrlSearch_ = NULL;
+		cmdExport_ = NULL;
 		searchGroup_ = NULL;
+		toolsGroup_ = NULL;
 		customDirController_ = NULL;
-		baseViewPtr_ = NULL;
-		grymAppPtr_ = NULL;
+		g_pi.baseView = NULL;
+		g_pi.grymApp = NULL;
 	} catch(...) {
 	}
 
@@ -109,7 +126,7 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 STDMETHODIMP CPluginImpl::get_XMLInfo( BSTR *pVal )
 {
 	try {
-		if ( !pVal)
+		if ( !pVal )
 			return E_POINTER;
 		*pVal = 0;
 

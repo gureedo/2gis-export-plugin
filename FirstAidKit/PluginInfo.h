@@ -14,32 +14,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "StdAfx.h"
-#include "ControlBase.h"
+#pragma once
 
-void ControlBase::SetAccelerator( DWORD accelerator )
+class CPluginInfo
 {
-	accelerator_ = accelerator;
-}
+public:
+	GrymCore::IGrymPtr grymApp;
+	GrymCore::IBaseViewThreadPtr baseView;
 
-HRESULT WINAPI ControlBase::ICommandAcceleratorQIFunc( void *pv, REFIID /*riid*/, LPVOID *ppv, DWORD /*dw*/ )
-{
-	ControlBase *pThis = static_cast<ControlBase *>(pv);
-	*ppv = NULL;
-	
-	if ( pThis->accelerator_ ) {
-		*ppv = static_cast<GrymCore::ICommandAccelerator *>(pThis);
-		pThis->AddRef();
-		return S_OK;
-	}
+	GrymCore::IMapCoordinateTransformationGeoPtr coordinateTranslator() const;
+};
 
-	return E_NOINTERFACE;
-}
-
-STDMETHODIMP ControlBase::get_Accelerator( LONG *pVal )
-{
-	if ( !pVal )
-		return E_POINTER;
-	*pVal = accelerator_;
-	return S_OK;
-}
+extern CPluginInfo g_pi;

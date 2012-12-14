@@ -14,19 +14,47 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "StdAfx.h"
-#include "MenuCommand.h"
+#include "stdafx.h"
+#include "resource.h"
+#include "Util.h"
+#include "CmdExport.h"
+#include "DlgExport.h"
+#include "PluginInfo.h"
 
-GrymCore::ICommandActionPtr MenuCommand::CreateInstance( const ControlAppearanceParams &appearance, DWORD accelerator )
+GrymCore::ICommandActionPtr CCmdExport::CreateInstance()
 {
-	ATL::CComObject<MenuCommand> *obj;
-	ATLVERIFY(S_OK == ATL::CComObject<MenuCommand>::CreateInstance(&obj));
+	ATL::CComObject<CCmdExport> *obj;
+	ATLVERIFY(S_OK == ATL::CComObject<CCmdExport>::CreateInstance(&obj));
 	GrymCore::ICommandActionPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
-	obj->SetPlacement(appearance.placement_code);
-	obj->SetAppearance(appearance.tag, appearance.caption, appearance.description, appearance.icon);
-	obj->SetAccelerator(accelerator);
+	obj->tag_ = OLESTR("FirstAidKit.MainTab.ToolsGroup.CmdExport");
+	obj->placement_code_ = OLESTR("0001CmdExport:0");
+	obj->caption_ = OLESTR("Export");
+	obj->description_ = OLESTR("DESCRIPTION");
+	obj->icon_ = Util::LoadResourceRaster(g_pi.baseView->Factory, IDB_EXPORT);
 
 	return rv;
+}
+
+CCmdExport::CCmdExport()
+{
+}
+
+CCmdExport::~CCmdExport()
+{
+}
+
+STDMETHODIMP CCmdExport::raw_OnCommand()
+{
+	try {
+		CDlgExport dlg;
+		
+		dlg.DoModal();
+
+		return S_OK;
+	} catch (...) {
+	}
+
+	return E_FAIL;
 }
