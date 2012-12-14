@@ -28,8 +28,10 @@ using namespace std;
 CDlgExport::CDlgExport()
 {
 	// organizations tables
-	m_tables.push_back(new TableInfo(_T("grym_org"), _T("Organization"), false));
+	m_tables.push_back(new TableInfo(_T("grym_org"), _T("Organizations"), false));
+	m_tables.push_back(new TableInfo(_T("grym_org_rub3"), _T("Organization rubrics"), true));
 	m_tables.push_back(new TableInfo(_T("grym_org_fil"), _T("Organization suboffices"), true));
+	m_tables.push_back(new TableInfo(_T("grym_org_fil_rub3"), _T("Organization suboffice rubrics"), true));
 	m_tables.push_back(new TableInfo(_T("grym_rub1"), _T("Rubric 1"), false));
 	m_tables.push_back(new TableInfo(_T("grym_rub2"), _T("Rubric 2"), false));
 	m_tables.push_back(new TableInfo(_T("grym_rub3"), _T("Rubric 3"), false));
@@ -41,11 +43,11 @@ CDlgExport::CDlgExport()
 	m_tables.push_back(new TableInfo(_T("grym_map_district"), _T("Disctincts"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_microdistrict"), _T("Microdistincts"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_city"), _T("Cities (secondrary)"), false));
-	//m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_rwstation"), _T("Railroad stations"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_stationbay"), _T("Station bays"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_territory"), _T("Territories"), false));
 	m_tables.push_back(new TableInfo(_T("grym_map_territory_alias"), _T("Territory aliases"), true));
-	//m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
+	m_tables.push_back(new TableInfo(_T("grym_map_sight"), _T("Sights"), false));
 
 	// common tables
 	m_tables.push_back(new TableInfo(_T("grym_city"), _T("Cities (common)"), false));
@@ -131,16 +133,19 @@ LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 	wstring logStr;
 	CString bufStr;
 
+	CWaitCursor waitCursor;
 	::EnableWindow(GetDlgItem(IDC_BTNEXPORT), FALSE);
 	::EnableWindow(GetDlgItem(IDCANCEL), FALSE);
 	::EnableWindow(GetDlgItem(IDC_TABLES), FALSE);
+	::EnableWindow(GetDlgItem(IDC_DSTDIR), FALSE);
+	::EnableWindow(GetDlgItem(IDC_BTNSELFOLDER), FALSE);
 	m_wndLog.ResetContent();
 
 	GetDlgItemText(IDC_DSTDIR, bufStr);
 	wstring dstDir = bufStr;
 
 	if ( dstDir.empty() ) {
-		m_wndLog.AddString(_T("Destination folder not selected."));
+		log(_T("Destination folder not selected."));
 		return 0;
 	}
 
@@ -157,30 +162,33 @@ LRESULT CDlgExport::OnExport( WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		m_wndTableList.SelectItem(tableIdx);
 		logStr = _T("Processing table ");
 		logStr += info->name;
-		m_wndLog.AddString(logStr.c_str());
+		log(logStr);
 
 		wstring csvFileName = dstDir + info->name + _T(".csv");
+
+		processMessages();
 
 		try {
 			exportTable(info->name, csvFileName);
 		} catch(wofstream::failure e) {
 			logStr = _T("Error: ");
 			logStr += CA2W(e.what());
-			m_wndLog.AddString(logStr.c_str());
+			log(logStr);
 		} catch(wstring e) {
 			logStr = _T("Error: ");
 			logStr += e;
-			m_wndLog.AddString(logStr.c_str());
+			log(logStr);
 		} catch (...) {
-			m_wndLog.AddString(_T("Unknown error occured!"));
+			log(_T("Unknown error occured!"));
 		}
-
-		processMessages();
 	}
 
+	log(_T("Export complete!"));
 	::EnableWindow(GetDlgItem(IDC_BTNEXPORT), TRUE);
 	::EnableWindow(GetDlgItem(IDC_TABLES), TRUE);
 	::EnableWindow(GetDlgItem(IDCANCEL), TRUE);
+	::EnableWindow(GetDlgItem(IDC_DSTDIR), TRUE);
+	::EnableWindow(GetDlgItem(IDC_BTNSELFOLDER), TRUE);
 
 	return 0;
 }
@@ -189,6 +197,11 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 {
 	locale utf8_locale(locale("", locale::ctype), new codecvt_utf8<wchar_t, 0x10ffff, generate_header>);
 	wofstream csvStream(outFile, ios::out|ios::trunc);
+	if ( !csvStream.good() ) {
+		wstringstream ss;
+		ss << _T("Failed to open '") << outFile << _T("' for writing");
+		throw wstring(ss.str());
+	}
 	csvStream.imbue(utf8_locale);
 
 	if ( tableName == _T("grym_org") ) {
@@ -200,6 +213,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			
 			csvStream << idx
 				<< _T(";")
 				<< (int)row->GetValue(OLESTR("stable_id"))
@@ -209,7 +223,29 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 
-	// grym_org_rub3
+	else if ( tableName == _T("grym_org_rub3") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_org"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#org_id;rub3_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			int rubCount = row->GetValue(OLESTR("rub_count"));
+			int rubIdx = 0;
+			while( ++rubIdx <= rubCount ) {
+				wstringstream ss;
+				ss << _T("rub_") << rubIdx;
+				GrymCore::IDataRowPtr rubRow = row->GetValue(ss.str().c_str());
+
+				csvStream << idx;
+				csvStream << _T(";");
+				csvStream << rubRow->Index;
+				csvStream << endl;
+			}
+		}
+	}
 
 	else if ( tableName == _T("grym_org_fil") ) {
 		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_org"));
@@ -245,8 +281,39 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 	
-	// grym_org_fil_rub3
-	// grym_org_fil_addr
+	else if ( tableName == _T("grym_org_fil_rub3") ) {
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_org"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#org_fil_id;rub3_id") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			int filCount = row->GetValue(OLESTR("fil_count"));
+			int filIdx = 0;
+			while ( ++filIdx <= filCount ) {
+				wstringstream ss;
+				ss << _T("fil_") << filIdx;
+				GrymCore::IDataRowPtr filRow = row->GetValue(ss.str().c_str());
+
+				int rubCount = filRow->GetValue(OLESTR("rub_count"));
+				int rubIdx = 0;
+				while ( ++rubIdx <= rubCount ) {
+					wstringstream ss;
+					ss << _T("rub_") << rubIdx;
+					GrymCore::IDataRowPtr rubRow = filRow->GetValue(ss.str().c_str());
+
+					csvStream << filRow->Index;
+					csvStream << _T(";");
+					csvStream << rubRow->Index;
+					csvStream << endl;
+				}
+			}
+		}
+	}
+
+	// grym_org_fil_addr (i think map_building is enough)
 
 	else if ( tableName == _T("grym_rub1") ) {
 		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_rub1"));
@@ -257,6 +324,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("name"))
@@ -274,6 +342,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IDataRowPtr parentRow = row->GetValue(OLESTR("parent"));
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("name"))
@@ -293,6 +362,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IDataRowPtr parentRow = row->GetValue(OLESTR("parent"));
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("name"))
@@ -358,6 +428,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 				wstringstream ss;
 				ss << _T("addr_") << addrIdx;
 				GrymCore::IDataRowPtr addrRow = row->GetValue(ss.str().c_str());
+				
 				csvStream << idx;
 				csvStream << _T(";");
 				csvStream << addrRow->Index;
@@ -421,6 +492,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IMapPointPtr point;
 			GrymCore::IFeaturePtr feature = row;
+			
 			csvStream << idx;
 			csvStream << _T(";");
 			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
@@ -461,6 +533,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IMapPointPtr point;
 			GrymCore::IFeaturePtr feature = row;
+			
 			csvStream << idx;
 			csvStream << _T(";");
 			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
@@ -496,6 +569,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			GrymCore::IMapPointPtr point;
 			GrymCore::IFeaturePtr feature = row;
 			GrymCore::IDataRowPtr cityRow = row->GetValue(OLESTR("city"));
+			
 			csvStream << idx;
 			csvStream << _T(";");
 			csvStream << cityRow->Index;
@@ -518,7 +592,30 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 
-	// grym_map_rwstation
+	else if ( tableName == _T("grym_map_rwstation") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_rwstation"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_rwstation_id;map_rwstation_name;center_x;center_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+			
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
 
 	else if ( tableName == _T("grym_map_stationbay") ) {
 		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
@@ -532,6 +629,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IMapPointPtr point;
 			GrymCore::IFeaturePtr feature = row;
+			
 			csvStream << idx;
 			csvStream << _T(";");
 			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
@@ -556,6 +654,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IMapPointPtr point;
 			GrymCore::IFeaturePtr feature = row;
+			
 			csvStream << idx;
 			csvStream << _T(";");
 			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
@@ -592,6 +691,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 			while( ++aliasIdx <= aliasCount ) {
 				wstringstream ss;
 				ss << _T("alias_") << aliasIdx;
+
 				csvStream << idx;
 				csvStream << _T(";");
 				csvStream << (_bstr_t)row->GetValue(ss.str().c_str());
@@ -600,7 +700,45 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		}
 	}
 
-	// grym_map_sight
+	else if ( tableName == _T("grym_map_sight") ) {
+		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
+		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_map_sight"));
+		long count = table->GetRecordCount();
+		long idx = 0;
+
+		csvStream << _T("#map_sight_id;map_sight_name;map_sight_type;map_sight_info;center_x;center_y;rect_min_x;rect_min_y;rect_max_x;rect_max_y") << endl;
+
+		while ( ++idx <= count ) {
+			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			GrymCore::IMapPointPtr point;
+			GrymCore::IFeaturePtr feature = row;
+
+			csvStream << idx;
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("name"));
+			csvStream << _T(";");
+			csvStream << (_bstr_t)row->GetValue(OLESTR("type"));
+			csvStream << _T(";");
+			wstring info = (_bstr_t)row->GetValue(OLESTR("info"));
+			replace(info.begin(), info.end(), _T(';'), _T(','));
+			csvStream << info;
+			point = geoTrans->LocalToGeo(feature->CenterPoint);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Min);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << _T(";");
+			point = geoTrans->LocalToGeo(feature->BoundRect->Max);
+			csvStream << point->X;
+			csvStream << _T(";");
+			csvStream << point->Y;
+			csvStream << endl;
+		}
+	}
 
 	else if ( tableName == _T("grym_city") ) {
 		GrymCore::ITablePtr table = g_pi.baseView->Database->GetTable(OLESTR("grym_city"));
@@ -611,6 +749,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("name"))
@@ -638,6 +777,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IDataRowPtr cityRow = row->GetValue(OLESTR("city"));
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("name"))
@@ -663,6 +803,7 @@ void CDlgExport::exportTable( const std::wstring &tableName, const std::wstring 
 		while ( ++idx <= count ) {
 			GrymCore::IDataRowPtr row = table->GetRecord(idx);
 			GrymCore::IDataRowPtr streetRow = row->GetValue(OLESTR("street"));
+			
 			csvStream << idx
 				<< _T(";")
 				<< (_bstr_t)row->GetValue(OLESTR("number"))
@@ -688,4 +829,10 @@ void CDlgExport::processMessages() const
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+}
+
+void CDlgExport::log( const std::wstring &message )
+{
+	int index = m_wndLog.AddString(message.c_str());
+	m_wndLog.SetCurSel(index);
 }

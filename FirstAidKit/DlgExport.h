@@ -61,4 +61,5 @@ private:
 
 	void exportTable( const std::wstring &tableName, const std::wstring &outFile ) const;
 	void processMessages() const;
+	void log( const std::wstring &message );
 };
