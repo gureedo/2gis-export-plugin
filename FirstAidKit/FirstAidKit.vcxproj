@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DlgExport.cpp" />
+    <ClCompile Include="ExtendedInfoBlock.cpp" />
     <ClCompile Include="GrymApiBase.cpp" />
     <ClCompile Include="CmdExport.cpp" />
     <ClCompile Include="OrgDataRowFilter.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DlgExport.h" />
+    <ClInclude Include="ExtendedInfoBlock.h" />
     <ClInclude Include="GrymApiBase.h" />
     <ClInclude Include="CmdExport.h" />
     <ClInclude Include="OrgDataRowFilter.h" />

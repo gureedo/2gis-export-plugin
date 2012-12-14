@@ -22,6 +22,7 @@
 #include "OrgDirectoryCustomController.h"
 #include "CmdExport.h"
 #include "PluginInfo.h"
+#include "ExtendedInfoBlock.h"
 
 GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 {
@@ -88,6 +89,12 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 		cmdExport_ = CCmdExport::CreateInstance();
 		GrymCore::IControlSetPtr(toolsGroup_)->AddControl(cmdExport_);
 
+		//////////////////////////////////////////////////////////////////////////
+		// Extended info block
+		//////////////////////////////////////////////////////////////////////////
+		GrymCore::IMapInfoControllerPtr infoBlock = CExtendedInfoBlock::CreateInstance(); 
+		g_pi.baseView->Frame->Map->MapInfoControllers->AddController(infoBlock);
+
 		return S_OK;
 	} catch(...) {
 	}
@@ -109,6 +116,7 @@ STDMETHODIMP CPluginImpl::raw_Terminate()
 		
 		if ( NULL != toolsGroup_ && NULL != cmdExport_ )
 			GrymCore::IControlSetPtr(searchGroup_)->RemoveControl(cmdExport_);
+
 		
 		ctrlSearch_ = NULL;
 		cmdExport_ = NULL;
