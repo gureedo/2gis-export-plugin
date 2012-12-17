@@ -61,6 +61,9 @@
     <ClCompile Include="PluginInfo.cpp">
       <Filter>Source Files\GrymCommon</Filter>
     </ClCompile>
+    <ClCompile Include="ExtendedInfoBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstAidKit.dgxpi">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="PluginInfo.h">
       <Filter>Header Files\GrymCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedInfoBlock.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
