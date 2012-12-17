@@ -31,11 +31,26 @@ GrymCore::IMapInfoControllerPtr CExtendedInfoBlock::CreateInstance()
 
 STDMETHODIMP CExtendedInfoBlock::raw_Check( GrymCore::IFeature *pFeature, VARIANT_BOOL *pVal )
 {
+	static const _bstr_t grym_map_building(_T("grym_map_building"));
+	static const _bstr_t grym_map_rwstation(_T("grym_map_rwstation"));
+	static const _bstr_t grym_map_stationbay(_T("grym_map_stationbay"));
+	static const _bstr_t grym_map_sight(_T("grym_map_sight"));
+
 	try {
 		if ( !pVal )
 			return E_POINTER;
 
-		*pVal = VARIANT_TRUE;
+		GrymCore::IDataRowPtr row = pFeature;
+
+
+
+		if ( row->GetType() == grym_map_building || row->GetType() == grym_map_rwstation ||
+				row->GetType() == grym_map_stationbay || row->GetType() == grym_map_sight ) {
+			*pVal = VARIANT_TRUE;
+		} else {
+			*pVal = VARIANT_FALSE;
+		}
+		
 
 		return S_OK;
 	} catch (...) {
@@ -66,8 +81,8 @@ STDMETHODIMP CExtendedInfoBlock::raw_Fill( GrymCore::IFeature *pFeature, GrymCor
 		GrymCore::IMapPointPtr point = geoTrans->LocalToGeo(pFeature->CenterPoint);
 		std::wstringstream ss;
 
-		ss << _T("<b>Координаты</b><hr>");
-		ss << point->Y << _T(" ") << point->X;
+		ss << _T("<b>Coordinates</b><hr>");
+		ss << g_pi.decimal2degree(point->Y) << _T(" ") << g_pi.decimal2degree(point->X);
 
 		pTab->put_Text(_bstr_t(ss.str().c_str()));
 

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <string>
+
 class CPluginInfo
 {
 public:
@@ -23,6 +25,7 @@ public:
 	GrymCore::IBaseViewThreadPtr baseView;
 
 	GrymCore::IMapCoordinateTransformationGeoPtr coordinateTranslator() const;
+	static std::wstring decimal2degree( double x );
 };
 
 extern CPluginInfo g_pi;
