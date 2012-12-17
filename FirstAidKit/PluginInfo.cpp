@@ -16,6 +16,8 @@
 
 #include "stdafx.h"
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include "PluginInfo.h"
 
 CPluginInfo g_pi;
@@ -31,4 +33,23 @@ GrymCore::IMapCoordinateTransformationGeoPtr CPluginInfo::coordinateTranslator()
 	}
 
 	return pGEO;
+}
+
+std::wstring CPluginInfo::decimal2degree( double x )
+{
+	std::wstringstream ss;
+	int d = static_cast<int>(x);
+	x = (x-d)*60;
+	int m = static_cast<int>(x);
+	x = (x-m)*60;
+	int s = static_cast<int>(x);
+	x = (x-s)*100;
+	int ds = static_cast<int>(x);
+	ss << std::setfill(_T('0'));
+	ss << std::setw(2) << d << _T('°');
+	ss << std::setw(2) << m << _T('\'');
+	ss << std::setw(2) << s << _T(',');
+	ss << std::setw(2) << ds << _T('"');
+
+	return ss.str();
 }
