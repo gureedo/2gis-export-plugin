@@ -16,16 +16,25 @@
 
 #pragma once
 
-#include <string>
-
-class CPluginInfo
+class ATL_NO_VTABLE CExtendedInfoBlock
+	: public ATL::CComObjectRootEx<ATL::CComSingleThreadModel>
+	, public GrymCore::IMapInfoController
 {
 public:
-	GrymCore::IGrymPtr grymApp;
-	GrymCore::IBaseViewThreadPtr baseView;
+	static GrymCore::IMapInfoControllerPtr CreateInstance();
 
-	GrymCore::IMapCoordinateTransformationGeoPtr coordinateTranslator() const;
-	static std::wstring decimal2degree( double x );
+	~CExtendedInfoBlock() {}
+
+protected:
+	CExtendedInfoBlock() {}
+
+	BEGIN_COM_MAP(CExtendedInfoBlock)
+		COM_INTERFACE_ENTRY(GrymCore::IMapInfoController)
+	END_COM_MAP()
+
+public:	// IMapInfoController
+	STDMETHOD(raw_Check)( GrymCore::IFeature *pFeature, VARIANT_BOOL *pVal );
+	STDMETHOD(get_Title)( BSTR *pVal );
+	STDMETHOD(raw_Fill)( GrymCore::IFeature *pFeature, GrymCore::ICalloutTab *pTab );
+	STDMETHOD(raw_OnTabAction)( GrymCore::ICalloutTab *pTab, BSTR bsActionID );
 };
-
-extern CPluginInfo g_pi;
