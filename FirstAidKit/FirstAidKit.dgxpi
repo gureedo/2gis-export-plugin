@@ -1,7 +1,7 @@
 ﻿<grym_plugin_info>
   <module_dll path="FirstAidKit.dll" />
   <name>First Aid Kit</name>
-  <description>DESCRIPTION HERE</description>
+  <description>Blip-blop!</description>
   <tag>FIRSTAIDKITPLUGIN</tag>
   <copyright>gureedo, 2012, Freeware</copyright>
   <icon>

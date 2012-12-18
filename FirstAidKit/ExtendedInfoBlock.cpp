@@ -31,26 +31,12 @@ GrymCore::IMapInfoControllerPtr CExtendedInfoBlock::CreateInstance()
 
 STDMETHODIMP CExtendedInfoBlock::raw_Check( GrymCore::IFeature *pFeature, VARIANT_BOOL *pVal )
 {
-	static const _bstr_t grym_map_building(_T("grym_map_building"));
-	static const _bstr_t grym_map_rwstation(_T("grym_map_rwstation"));
-	static const _bstr_t grym_map_stationbay(_T("grym_map_stationbay"));
-	static const _bstr_t grym_map_sight(_T("grym_map_sight"));
 
 	try {
 		if ( !pVal )
 			return E_POINTER;
 
-		GrymCore::IDataRowPtr row = pFeature;
-
-
-
-		if ( row->GetType() == grym_map_building || row->GetType() == grym_map_rwstation ||
-				row->GetType() == grym_map_stationbay || row->GetType() == grym_map_sight ) {
-			*pVal = VARIANT_TRUE;
-		} else {
-			*pVal = VARIANT_FALSE;
-		}
-		
+		*pVal = VARIANT_TRUE;
 
 		return S_OK;
 	} catch (...) {
@@ -78,12 +64,36 @@ STDMETHODIMP CExtendedInfoBlock::raw_Fill( GrymCore::IFeature *pFeature, GrymCor
 {
 	try {
 		GrymCore::IMapCoordinateTransformationGeoPtr geoTrans = g_pi.coordinateTranslator();
-		GrymCore::IMapPointPtr point = geoTrans->LocalToGeo(pFeature->CenterPoint);
+		GrymCore::IMapPointPtr point;
 		std::wstringstream ss;
 
-		ss << _T("<b>Coordinates</b><hr>");
+		// point coordinates
+		HWND hWnd = (HWND)g_pi.baseView->Frame->Map->HWindow;
+		POINT curPos;
+		::GetCursorPos(&curPos);
+		::ScreenToClient(hWnd, &curPos);
+		GrymCore::IDevPointPtr devPtr = g_pi.baseView->Factory->CreateDevPoint(curPos.x, curPos.y);
+		GrymCore::IMapDevicePtr devMap = g_pi.baseView->Frame->Map;
+		GrymCore::IMapPointPtr mapPtr = devMap->DeviceToMap(devPtr);
+		point = geoTrans->LocalToGeo(mapPtr);
+
+		ss << _T("<b>Point coordinates</b><br>");
 		ss << g_pi.decimal2degree(point->Y) << _T(" ") << g_pi.decimal2degree(point->X);
 
+		// selected object coordinates
+		static const _bstr_t grym_map_building(_T("grym_map_building"));
+		static const _bstr_t grym_map_rwstation(_T("grym_map_rwstation"));
+		static const _bstr_t grym_map_stationbay(_T("grym_map_stationbay"));
+		static const _bstr_t grym_map_sight(_T("grym_map_sight"));
+		GrymCore::IDataRowPtr row = pFeature;
+		
+		if ( row->GetType() == grym_map_building || row->GetType() == grym_map_rwstation ||
+				row->GetType() == grym_map_stationbay || row->GetType() == grym_map_sight ) {
+			ss << _T("<hr><b>Object coordinates</b><br>");
+			point = geoTrans->LocalToGeo(pFeature->CenterPoint);
+			ss << g_pi.decimal2degree(point->Y) << _T(" ") << g_pi.decimal2degree(point->X);
+		}
+		
 		pTab->put_Text(_bstr_t(ss.str().c_str()));
 
 		return S_OK;

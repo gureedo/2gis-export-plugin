@@ -23,6 +23,7 @@
 #include "CmdExport.h"
 #include "PluginInfo.h"
 #include "ExtendedInfoBlock.h"
+#include "version.h"
 
 GrymCore::IGrymPluginPtr CPluginImpl::CreateInstance()
 {
@@ -138,19 +139,20 @@ STDMETHODIMP CPluginImpl::get_XMLInfo( BSTR *pVal )
 			return E_POINTER;
 		*pVal = 0;
 
-		static const _bstr_t data(OLESTR("<grym_plugin_info>")
-			OLESTR("<name>First Aid Kit</name>")
-			OLESTR("<description>DESCRIPTION HERE!</description>")
-			OLESTR("<copyright>gureedo, 2012, Freeware</copyright>")
-			OLESTR("<tag>FIRSTAIDKITPLUGIN</tag>")
-			OLESTR("<supported_languages>")
-			OLESTR("<language>ru</language>")
-			OLESTR("<language>en</language>")
-			OLESTR("</supported_languages>")
-			OLESTR("<requirements>")
-			OLESTR("<requirement_api>API-1.4</requirement_api>")
-			OLESTR("</requirements>")
-			OLESTR("</grym_plugin_info>"));
+		static const _bstr_t data(
+			OLESTR("<grym_plugin_info>")
+				OLESTR("<name>First Aid Kit</name>")
+				OLESTR("<description>Blip-blop! Version") FAK_VER_STR OLESTR("</description>")
+				OLESTR("<copyright>gureedo, 2012, Freeware</copyright>")
+				OLESTR("<tag>FIRSTAIDKITPLUGIN</tag>")
+				OLESTR("<supported_languages>")
+					OLESTR("<language>*</language>")
+				OLESTR("</supported_languages>")
+				OLESTR("<requirements>")
+					OLESTR("<requirement_api>API-1.4</requirement_api>")
+				OLESTR("</requirements>")
+			OLESTR("</grym_plugin_info>")
+		);
 	
 		*pVal = data.copy();
 
