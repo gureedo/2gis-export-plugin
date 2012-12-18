@@ -3,5 +3,5 @@
 #### What this plugin can do:
 - Search organization in wildcard mode
 - Export database to csv files
-
+- Coordinates for current point on map
 
