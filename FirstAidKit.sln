@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FirstAidKit", "FirstAidKit\FirstAidKit.vcxproj", "{18CD78BC-D328-481C-8B1C-90404874EBB6}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{205FB373-37E4-436A-B58F-741C842CBFDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +15,6 @@ Global
 		{18CD78BC-D328-481C-8B1C-90404874EBB6}.Debug|Win32.Build.0 = Debug|Win32
 		{18CD78BC-D328-481C-8B1C-90404874EBB6}.Release|Win32.ActiveCfg = Release|Win32
 		{18CD78BC-D328-481C-8B1C-90404874EBB6}.Release|Win32.Build.0 = Release|Win32
-		{205FB373-37E4-436A-B58F-741C842CBFDF}.Debug|Win32.ActiveCfg = Debug
-		{205FB373-37E4-436A-B58F-741C842CBFDF}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
