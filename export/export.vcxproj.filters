@@ -66,10 +66,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FirstAidKit.dgxpi">
+    <None Include="export.dgxpi">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="FirstAidKit.def">
+    <None Include="export.def">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\export.png">
@@ -124,7 +124,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="FirstAidKit.rc">
+    <ResourceCompile Include="export.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

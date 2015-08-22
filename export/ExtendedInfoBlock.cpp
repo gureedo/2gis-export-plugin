@@ -51,7 +51,7 @@ STDMETHODIMP CExtendedInfoBlock::get_Title( BSTR *pVal )
 		if ( !pVal )
 			return E_POINTER;
 
-		*pVal = _bstr_t(OLESTR("FAK")).Detach();
+		*pVal = _bstr_t(OLESTR("EXPORT")).Detach();
 
 		return S_OK;
 	} catch (...) {

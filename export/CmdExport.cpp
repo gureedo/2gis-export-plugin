@@ -28,7 +28,7 @@ GrymCore::ICommandActionPtr CCmdExport::CreateInstance()
 	GrymCore::ICommandActionPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
-	obj->tag_ = OLESTR("FirstAidKit.MainTab.ToolsGroup.CmdExport");
+	obj->tag_ = OLESTR("Export.MainTab.ToolsGroup.CmdExport");
 	obj->placement_code_ = OLESTR("0001CmdExport:0");
 	obj->caption_ = OLESTR("Export");
 	obj->description_ = OLESTR("DESCRIPTION");

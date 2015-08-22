@@ -86,9 +86,9 @@ BEGIN
         BEGIN
             VALUE "FileVersion", "1.0.0.1"
             VALUE "LegalCopyright", "gureedo"
-            VALUE "InternalName", "FirstAidKit.dll"
-            VALUE "OriginalFilename", "FirstAidKit.dll"
-            VALUE "ProductName", "FirstAidKit 2GIS Plugin"
+            VALUE "InternalName", "export.dll"
+            VALUE "OriginalFilename", "export.dll"
+            VALUE "ProductName", "2GIS Export Plugin"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
@@ -106,7 +106,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROJNAME            "FirstAidKit"
+    IDS_PROJNAME            "export"
 END
 
 #endif    // Russian (Russia) resources

@@ -1,7 +1,7 @@
-# 2gis first aid kit plugin
+# 2gis export plugin
 
 #### What this plugin can do:
+- Export some tables to csv files
 - Search organization in wildcard mode
-- Export database to csv files
 - Coordinates for current point on map
 

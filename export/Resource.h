@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by FirstAidKit.rc
+// Used by export.rc
 //
 #define IDS_PROJNAME                    100
 #define IDC_LIST1                       201

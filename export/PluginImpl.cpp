@@ -49,19 +49,18 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 		GrymCore::IRibbonBarPtr ribbonBar = baseViewFrame->GetMainRibbonBar();
 
 		// create own tab
-		static const _bstr_t firstAidTabTag(_T("FirstAidKit.MainTab"));
-		static const _bstr_t firstAidTabPlacementCode(_T("3000FirstAidKit:0"));
-		static const _bstr_t firstAidTabTitle(_T("First Aid Kit"));
-		GrymCore::IRibbonTabPtr firstAidTab = ribbonBar->CreateTab(firstAidTabTag, 
-			firstAidTabPlacementCode,firstAidTabTitle);
+		static const _bstr_t exportTabTag(_T("Export.MainTab"));
+		static const _bstr_t exportTabPlacementCode(_T("3000Export:0"));
+		static const _bstr_t exportTabTitle(_T("EXPORT"));
+		GrymCore::IRibbonTabPtr exportTab = ribbonBar->CreateTab(exportTabTag, exportTabPlacementCode,exportTabTitle);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Search group
 		//////////////////////////////////////////////////////////////////////////
-		static const _bstr_t searchGroupTag(_T("FirstAidKit.MainTab.SearchGroup"));
+		static const _bstr_t searchGroupTag(_T("Export.MainTab.SearchGroup"));
 		static const _bstr_t searchGroupPlacementCode(_T("0001SearchGroup:0"));
 		static const _bstr_t searchGroupTitle(_T("Organization search"));
-		searchGroup_ = firstAidTab->CreateGroup(GrymCore::RibbonGroupTypeSearch,
+		searchGroup_ = exportTab->CreateGroup(GrymCore::RibbonGroupTypeSearch,
 			searchGroupTag, searchGroupPlacementCode, searchGroupTitle);
 
 		searchGroup_->SetClearButtonTooltips(
@@ -80,10 +79,10 @@ STDMETHODIMP CPluginImpl::raw_Initialize( GrymCore::IGrym *pRoot, GrymCore::IBas
 		//////////////////////////////////////////////////////////////////////////
 		// Tools group
 		//////////////////////////////////////////////////////////////////////////
-		static const _bstr_t toolsGroupTag(_T("FirstAidKit.MainTab.ToolsGroup"));
+		static const _bstr_t toolsGroupTag(_T("Export.MainTab.ToolsGroup"));
 		static const _bstr_t toolsGroupPlacementCode(_T("0002ToolsGroup:0"));
 		static const _bstr_t toolsGroupTitle(_T("Tools"));
-		toolsGroup_ = firstAidTab->CreateGroup(GrymCore::RibbonGroupTypeSimple,
+		toolsGroup_ = exportTab->CreateGroup(GrymCore::RibbonGroupTypeSimple,
 			toolsGroupTag, toolsGroupPlacementCode, toolsGroupTitle);
 
 		// export button
@@ -141,10 +140,10 @@ STDMETHODIMP CPluginImpl::get_XMLInfo( BSTR *pVal )
 
 		static const _bstr_t data(
 			OLESTR("<grym_plugin_info>")
-				OLESTR("<name>First Aid Kit</name>")
-				OLESTR("<description>Blip-blop! Version") FAK_VER_STR OLESTR("</description>")
+				OLESTR("<name>Export</name>")
+				OLESTR("<description>Blip-blop! Version") PLUGIN_VER_STR OLESTR("</description>")
 				OLESTR("<copyright>gureedo, 2012, Freeware</copyright>")
-				OLESTR("<tag>FIRSTAIDKITPLUGIN</tag>")
+				OLESTR("<tag>EXPORtPLUGIN</tag>")
 				OLESTR("<supported_languages>")
 					OLESTR("<language>*</language>")
 				OLESTR("</supported_languages>")

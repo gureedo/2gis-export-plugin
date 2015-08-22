@@ -14,7 +14,7 @@
     <ProjectGuid>{18CD78BC-D328-481C-8B1C-90404874EBB6}</ProjectGuid>
     <RootNamespace>MapTestPlugin</RootNamespace>
     <Keyword>AtlProj</Keyword>
-    <ProjectName>FirstAidKit</ProjectName>
+    <ProjectName>export</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -83,7 +83,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>.\FirstAidKit.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\export.def</ModuleDefinitionFile>
       <IgnoreEmbeddedIDL>true</IgnoreEmbeddedIDL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +120,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <ModuleDefinitionFile>.\FirstAidKit.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\export.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -150,8 +150,8 @@
     <ClCompile Include="Wildcard.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FirstAidKit.def" />
-    <None Include="FirstAidKit.dgxpi" />
+    <None Include="export.def" />
+    <None Include="export.dgxpi" />
     <None Include="res\export.png" />
   </ItemGroup>
   <ItemGroup>
@@ -172,7 +172,7 @@
     <ClInclude Include="Wildcard.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="FirstAidKit.rc" />
+    <ResourceCompile Include="export.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

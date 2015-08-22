@@ -14,26 +14,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#include "stdafx.h"
-#include "resource.h"
-#include "PluginImpl.h"
+#pragma once
 
-class CFirstAidKitModule : public CAtlDllModuleT< CFirstAidKitModule > {};
-CFirstAidKitModule _AtlModule;
+#define _CSTR(x) _T(#x)
+#define CSTR(x) _CSTR(x)
 
-extern "C" BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved )
-{
-	UNREFERENCED_PARAMETER(hInstance);
+#define PLUGIN_VER_MJR 0
+#define PLUGIN_VER_MNR 1
 
-	return _AtlModule.DllMain(dwReason, lpReserved); 
-}
-
-extern "C" int __stdcall CreateGrymPlugin( IUnknown **pPlugin )
-{
-	GrymCore::IGrymPluginPtr plugin = CPluginImpl::CreateInstance();
-	if ( NULL == plugin ) {
-		return 1;
-	}
-	*pPlugin = IUnknownPtr(plugin).Detach();
-	return 0;
-}
+#define PLUGIN_VER_STR CSTR(PLUGIN_VER_MJR) _T(".") CSTR(PLUGIN_VER_MNR)

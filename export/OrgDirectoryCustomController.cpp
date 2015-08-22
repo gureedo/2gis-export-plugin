@@ -18,7 +18,7 @@
 #include "OrgDirectoryCustomController.h"
 #include "OrgDataRowFilter.h"
 
-const _bstr_t COrgDirectoryCustomController::CriterionName = OLESTR("fak_org_search");
+const _bstr_t COrgDirectoryCustomController::CriterionName = OLESTR("export_org_search");
 
 GrymCore::IStdDirectoryCustomControllerPtr COrgDirectoryCustomController::CreateInstance()
 {

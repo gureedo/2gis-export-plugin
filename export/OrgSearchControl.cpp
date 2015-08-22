@@ -27,7 +27,7 @@ GrymCore::ISearchGroupControlPtr COrgSearchControl::CreateInstance()
 	GrymCore::ISearchGroupControlPtr rv = obj;
 	ATLASSERT(NULL != rv);
 
-	obj->tag_ = OLESTR("FirstAidKit.MainTab.SearchControl");
+	obj->tag_ = OLESTR("Export.MainTab.SearchControl");
 	obj->placement_code_ = 
 		OLESTR("<control_pos>")
 		OLESTR("<size min_width=\"150\" max_width=\"300\" height_in_rows=\"1\" />") 
